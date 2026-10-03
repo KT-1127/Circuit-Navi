@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>回路ナビ｜センサーを選んでブレッドボードの配線を見よう</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#FFFFFF; --ink:#1B2335; --soft:#5B6579; --line:#DCE3EE; --tint:#F2F6FC; --mat:#E6F0FF;
+  --yellow:#FFD21A; --red:#E8402F; --blue:#2F6FE0; --green:#1FA463; --violet:#8B5CF6; --teal:#129FB2; --orange:#F28A1E;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0; color:var(--ink); background:var(--bg); font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif; line-height:1.65; min-height:100vh}
+.r{font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","BIZ UDPGothic",sans-serif}
+/* ヘッダー：ブレッドボードの電源レール */
+.top{background:var(--yellow); padding:22px 16px 18px}
+.topin{max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:14px}
+.logo{width:56px; height:56px; flex:none}
+h1{margin:0; font-size:clamp(1.8rem,5vw,2.6rem); line-height:1.1; font-weight:800; letter-spacing:.03em}
+.top p{margin:6px 0 0; font-size:1rem; color:#3E3510}
+.rail{height:22px; background:
+   linear-gradient(var(--red),var(--red)) top/100% 3px no-repeat,
+   linear-gradient(var(--blue),var(--blue)) bottom/100% 3px no-repeat,
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Crect x='8' y='8' width='6' height='6' fill='%23fff' stroke='%2399A3B5' stroke-width='1.2'/%3E%3C/svg%3E") center/22px 22px repeat-x, #F7F8FA}
+.page{max-width:1180px; margin:0 auto; padding:22px 16px 40px}
+h2{display:flex; align-items:baseline; gap:10px; font-size:1.3rem; font-weight:800; margin:0 0 12px}
+h2 small{font-size:.82rem; font-weight:500; color:var(--soft)}
+.num{font-size:1.9rem; line-height:1; font-weight:800}
+.n1{color:var(--red)} .n2{color:var(--blue)} .n3{color:var(--teal)} .n4{color:var(--orange)}
+.pick{display:grid; gap:22px; grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){ .pick{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .pick > div:first-child{grid-column:1 / -1} }
+.cards{display:grid; gap:10px; grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:620px){ .cards.four{grid-template-columns:repeat(4,minmax(0,1fr))} }
+/* 選ぶカード */
+.key{--c:var(--blue); --ct:#E7EFFD; position:relative; text-align:left; font:inherit; color:var(--ink); background:#fff; border:2px solid var(--line); border-radius:16px;
+  padding:12px; cursor:pointer; display:flex; flex-direction:column; gap:2px; min-height:128px; transition:border-color .12s, background .12s, transform .08s}
+.key:hover{border-color:var(--c)}
+.key:active{transform:scale(.98)}
+.key .ic{width:42px; height:42px; color:var(--c)}
+.key .nm{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.22rem; line-height:1.25; margin-top:2px}
+.key .sb{font-size:.82rem; color:var(--soft); line-height:1.4}
+.key .chk{position:absolute; top:10px; right:10px; width:24px; height:24px; border-radius:50%; border:2px solid var(--line); background:#fff; display:grid; place-items:center}
+.key[aria-pressed="true"]{background:var(--ct); border-color:var(--c); border-width:3px; padding:11px}
+.key[aria-pressed="true"] .chk{background:var(--c); border-color:var(--c)}
+.key[aria-pressed="true"] .chk::after{content:""; width:6px; height:11px; border:solid #fff; border-width:0 3px 3px 0; transform:translateY(-1px) rotate(45deg)}
+.k-light{--c:#D9A400; --ct:#FFF6CC} .k-person{--c:var(--red); --ct:#FFE9E6} .k-sound{--c:var(--green); --ct:#E2F6EA} .k-ir{--c:var(--blue); --ct:#E7EFFD}
+.k-led{--c:#D9A400; --ct:#FFF6CC} .k-mel{--c:var(--violet); --ct:#F0E9FF} .k-off,.k-on{--c:var(--teal); --ct:#E0F5F8}
+.key.dim{opacity:.5}
+.lm{display:flex; gap:4px; margin-top:auto; padding-top:8px}
+.lm button{flex:1; font:inherit; font-size:.82rem; font-weight:700; border:1.5px solid var(--line); border-radius:10px; padding:5px 2px; background:#fff; color:var(--soft); cursor:pointer}
+.lm button[aria-pressed="true"]{background:#7A5B00; border-color:#7A5B00; color:#FFF6CC}
+.graph{width:100%; height:32px; margin-top:auto; color:var(--teal)}
+.graph path{fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round}
+.graph line{stroke:var(--soft); stroke-width:1.4; stroke-dasharray:3 3; opacity:.6}
+.hint3{margin:8px 2px 0; font-size:.8rem; color:var(--soft)}
+/* 結果 */
+.result{margin-top:30px; background:#fff; border:2px solid var(--line); border-radius:22px; padding:18px 16px 20px}
+.rhead{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.tag{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.88rem; padding:3px 12px; border-radius:999px; border:1.5px solid}
+.tag.print{background:#E5F6EC; color:#106B3B; border-color:#9FD8B7}
+.tag.nonprint{background:#FFF0DD; color:#8C4500; border-color:#F5C68E}
+#title{margin:0; font-size:clamp(1.15rem,2.6vw,1.45rem); font-weight:800; font-family:"M PLUS Rounded 1c",sans-serif; line-height:1.5; max-width:44em}
+.dnote{margin:8px 0 0; background:#FFF6EA; color:#7A3D00; border-left:4px solid var(--orange); border-radius:6px; padding:8px 12px; font-size:.92rem}
+.memo{margin-top:8px; font-size:.86rem; color:var(--soft)}
+.memo summary{cursor:pointer; font-weight:700; width:max-content}
+.memo p{margin:6px 0 0; background:var(--tint); border-radius:8px; padding:8px 10px}
+[hidden]{display:none!important}
+.empty .filled{display:none}
+.emptymsg{display:none}
+.empty .emptymsg{display:block; text-align:center; padding:28px 10px; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.08rem; line-height:1.7}
+/* フォルダ型タブ */
+.tabs{display:flex; gap:4px; margin:16px 0 0; border-bottom:2px solid var(--line); padding-left:4px}
+.tabs button{font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.98rem; padding:8px 14px; border:2px solid var(--line); border-bottom:0; border-radius:12px 12px 0 0;
+  background:var(--tint); color:var(--soft); cursor:pointer; margin-bottom:-2px}
+.tabs button[aria-selected="true"]{background:var(--mat); color:var(--blue); border-color:var(--line); position:relative}
+.tabs button[aria-selected="true"]::after{content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px; background:var(--mat)}
+.rgrid{display:grid; gap:16px; grid-template-columns:minmax(0,1fr); background:var(--mat); border-radius:0 0 16px 16px; padding:14px}
+@media (min-width:980px){ .rgrid{grid-template-columns:minmax(0,1fr) 300px} }
+.boardwrap{position:relative; overflow-x:auto; border-radius:12px}
+#board{display:block; width:100%; height:auto; user-select:none; -webkit-user-select:none}
+.boardwrap.zoomed #board{min-width:980px}
+.btools{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px}
+#scrollHint{font-size:.8rem; color:var(--soft)}
+#zoom{margin-left:auto}
+.small-btn{font:inherit; font-size:.85rem; border:1.5px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:4px 12px; cursor:pointer}
+#notes{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+.note{position:absolute; font-size:26px; color:var(--violet); animation:fly 1.6s ease-out forwards; font-weight:800}
+@keyframes fly{from{opacity:1; transform:translate(0,0) rotate(-10deg)} to{opacity:0; transform:translate(-30px,-70px) rotate(15deg)}}
+/* SVG */
+.pcb{fill:#FFFFFF; stroke:#B9C3D4; stroke-width:2}
+.chan{fill:#EEF1F6; stroke:#B9C2D3}
+.hole{fill:#fff; stroke:#3A4256; stroke-width:1.1}
+.rowl{font:800 13px "M PLUS Rounded 1c",sans-serif; fill:#14234B; text-anchor:middle}
+.coll{font:800 13px "M PLUS Rounded 1c",sans-serif; fill:#8A93A8; text-anchor:middle}
+.rail{font:800 17px sans-serif; text-anchor:middle} .rail.p{fill:#F0453A} .rail.m{fill:#2F6BE0}
+.wire{stroke:#F0453A; stroke-width:5.5; stroke-linecap:round}
+.wend{fill:#9E1C14}
+.leg{stroke:#8E95A3; stroke-width:2.2; stroke-linecap:round}
+.ft{fill:#C3C8D2; stroke:#6C7383; stroke-width:.8}
+.rb{fill:#F6DDAE; stroke:#B8955A}
+.pl{font:800 9px "M PLUS Rounded 1c",sans-serif; fill:#14234B; text-anchor:middle; paint-order:stroke; stroke:#FBFCFE; stroke-width:3px}
+.pl.small{font-size:8px}
+.pm{font:800 10px sans-serif; fill:#F0453A; text-anchor:middle; paint-order:stroke; stroke:#FBFCFE; stroke-width:3px}
+.pm.minus{fill:#2F6BE0}
+.cds{fill:#E2935F; stroke:#8A4D2A}
+.cdsl{fill:none; stroke:#FFF1DE; stroke-width:1.3}
+.capring{fill:#fff; stroke:#111; stroke-width:5; stroke-dasharray:44 9}
+.ledb{fill:#FFE066; stroke:#9C7F12; stroke-width:1.3}
+.tleg{stroke:#8E95A3; stroke-width:2.2}
+.trb{fill:#111}
+.trl{fill:#fff}
+.trt{font:800 8.5px sans-serif; fill:#111; text-anchor:middle}
+.vrb{fill:#3D6FD6; stroke:#1F3F8F; stroke-width:1.5}
+.notch{fill:#FBFCFE}
+.vrk{fill:none; stroke:#1F3F8F; stroke-width:1.5}
+.vra{stroke:#1F3F8F; stroke-width:1.5; fill:none}
+.vrl{fill:#fff}
+.vrt{font:800 9px "M PLUS Rounded 1c",sans-serif; fill:#14234B; text-anchor:middle}
+.vrp{fill:#C3C8D2; stroke:#1F3F8F}
+.swb{fill:#E4E6EB; stroke:#4A5263; stroke-width:1.5}
+.swd{fill:#111}
+.swc{fill:#FFD400; stroke:#8A6D00; stroke-width:1.5} .swc.held{fill:#C79A00}
+.pirring{fill:#E6E8EC; stroke:#B9BEC8; stroke-width:2}
+.pirt{font:800 9px "M PLUS Rounded 1c",sans-serif; fill:#14234B; text-anchor:middle; paint-order:stroke; stroke:#fff; stroke-width:3px}
+.dot{fill:#F0453A}
+.micring{fill:#7A7F88} .micin{stroke:#555; stroke-width:1}
+.irb{fill:#B9BDC4; stroke:#7E848E} .irdome{fill:#111}
+.irt{font:800 9px "M PLUS Rounded 1c",sans-serif; fill:#14234B; text-anchor:middle}
+.spkw{stroke:#111; stroke-width:3.5; stroke-linecap:round} .spkw.red{stroke:#F0453A}
+.spk{transform-box:fill-box; transform-origin:center}
+.spk0{fill:#111} .spk1{fill:#4B4F57} .spk2{fill:#FFD400}
+.night{fill:#091433; pointer-events:none; transition:opacity .6s}
+.part{cursor:pointer}
+.part.done{opacity:.42}
+.part.now{filter:drop-shadow(0 0 3px #FF8A00) drop-shadow(0 0 6px #FFB000)}
+.part.focus{filter:drop-shadow(0 0 3px #2F6BE0) drop-shadow(0 0 5px #2F6BE0)}
+.ring{fill:none; stroke:#FF8A00; stroke-width:2.5; animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{stroke-width:4.5; r:11}}
+.tryMode .part{cursor:default}
+
+
+.caution{margin-top:12px; background:#FFF6EA; border:2px solid #F5C68E; border-radius:12px; padding:12px 14px}
+.caution h3{margin:0 0 8px; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1rem; color:#8C4500}
+#cautionList{list-style:none; margin:0; padding:0; display:grid; gap:8px}
+#cautionList li{display:flex; flex-direction:column; gap:1px; font-size:.9rem; padding-left:10px; border-left:3px solid var(--orange)}
+#cautionList b{font-family:"M PLUS Rounded 1c",sans-serif; color:#7A3D00}
+#cautionList span{color:#6A4A2A}
+.cnote{margin:10px 0 0; font-size:.8rem; color:var(--soft)}
+.fi-name{margin:0 0 4px; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.02rem}
+.fi-role{margin:0 0 8px; font-size:.95rem}
+.fi-how{margin:0; font-size:.9rem; color:var(--soft)}
+.fi-warn{margin:8px 0 0; font-size:.9rem; color:#8C4500; background:#FFF0DD; border-radius:8px; padding:7px 9px}
+
+.topmode{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:4px 0 22px}
+@media (max-width:860px){ .topmode{grid-template-columns:1fr 1fr} }
+.topmode button{font:inherit; text-align:left; background:#fff; border:2px solid var(--line); border-radius:14px; padding:12px 14px; cursor:pointer; display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; column-gap:10px; align-items:center}
+.topmode .tm-n{grid-row:1 / 3; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.8rem; color:var(--soft)}
+.topmode .tm-t{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.15rem}
+.topmode .tm-s{font-size:.8rem; color:var(--soft)}
+.topmode button[data-top="basics"][aria-pressed="true"]{border-color:var(--teal); background:#E0F5F8}
+.topmode button[data-top="basics"][aria-pressed="true"] .tm-n{color:var(--teal)}
+.topmode button[data-top="navi"][aria-pressed="true"]{border-color:var(--blue); background:#E7EFFD}
+.topmode button[data-top="navi"][aria-pressed="true"] .tm-n{color:var(--blue)}
+.topmode button[data-top="learn"][aria-pressed="true"]{border-color:var(--violet); background:#F0E9FF}
+.topmode button[data-top="learn"][aria-pressed="true"] .tm-n{color:#6B3FD6}
+.topmode button[data-top="quiz"][aria-pressed="true"]{border-color:var(--orange); background:#FFF0DD}
+.topmode button[data-top="quiz"][aria-pressed="true"] .tm-n{color:#B35A00}
+@media (max-width:640px){
+  .topmode{gap:8px}
+  .topmode button{padding:10px 10px; column-gap:6px}
+  .topmode .tm-n{font-size:1.35rem}
+  .topmode .tm-t{font-size:.98rem; white-space:nowrap}
+  .topmode .tm-s{font-size:.72rem; line-height:1.35}
+  .lcard,.qcard{padding:16px 12px 20px}
+  .bex{padding:12px 10px}
+}
+
+/* ── 図（解説・しくみ・確認テスト共通） ── */
+.fig{display:block; width:100%; height:auto}
+.fg-l{fill:none; stroke:#1B2335; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.fg-b{fill:#fff; stroke:#1B2335; stroke-width:2}
+.fg-k{fill:#1B2335}
+.fg-t{font:700 11px "BIZ UDPGothic",sans-serif; fill:#1B2335}
+.fg-ts{font:400 9.5px "BIZ UDPGothic",sans-serif; fill:#3E4658}
+.fg-big{font:800 22px "M PLUS Rounded 1c",sans-serif; fill:#1B2335}
+.fg-red{fill:#D9311F} .fg-blue{fill:#2558C9} .fg-violet{fill:#6B3FD6} .fg-w{fill:#fff} .fg-green{fill:#14804A}
+.fg-cur{fill:none; stroke:#E8402F; stroke-width:2.2; stroke-linecap:round}
+.fg-curh{fill:#E8402F}
+
+/* ── このステップの解説 ── */
+.bex{background:#fff; border:2px solid #9BD8E0; border-radius:18px; padding:16px; margin:-8px 0 22px}
+.bexh{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.bexl{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.82rem; color:#fff; background:var(--teal); border-radius:999px; padding:3px 12px}
+.bex h3{margin:0; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.18rem}
+.exfigs{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.exfig{margin:0; background:var(--tint); border-radius:12px; padding:10px 10px 8px; display:flex; flex-direction:column; justify-content:space-between}
+.exfig .fig{max-height:250px}
+.exfig figcaption,.figbox figcaption{font-size:.82rem; color:var(--soft); text-align:center; margin-top:6px}
+.expts{margin:12px 0 0; padding:0; list-style:none; display:grid; gap:8px; counter-reset:ex}
+.expts li{position:relative; padding:9px 12px 9px 40px; background:#F4FAFB; border-radius:10px; font-size:.97rem; counter-increment:ex}
+.expts li::before{content:counter(ex); position:absolute; left:10px; top:9px; width:22px; height:22px; border-radius:50%; background:var(--teal); color:#fff; font:800 .8rem/22px "M PLUS Rounded 1c",sans-serif; text-align:center}
+.expts b{color:#0A6B7A}
+.lk{font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.9rem; border:2px solid var(--violet); color:#6B3FD6; background:#fff; border-radius:999px; padding:6px 16px; cursor:pointer; margin-top:12px}
+.lk:hover{background:#F0E9FF}
+.lk.q{border-color:var(--orange); color:#B35A00} .lk.q:hover{background:#FFF0DD}
+.lk.t{border-color:var(--teal); color:#0A6B7A} .lk.t:hover{background:#E0F5F8}
+
+/* ── しくみを知る ── */
+.lchips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px}
+.lchip{font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.88rem; border:2px solid var(--line); background:#fff; color:var(--soft); border-radius:999px; padding:6px 14px; cursor:pointer}
+.lchip:hover{border-color:var(--violet)}
+.lchip[aria-pressed="true"]{background:var(--violet); border-color:var(--violet); color:#fff}
+.lcard{background:#fff; border:2px solid var(--line); border-radius:20px; padding:20px 20px 24px}
+.lno{margin:0; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.85rem; color:#6B3FD6}
+.lcard h2{font-size:1.45rem; margin:2px 0 10px}
+.lcard h3{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.1rem; margin:24px 0 8px; padding-left:10px; border-left:5px solid var(--violet)}
+.lcard p{margin:0 0 10px}
+.lcard .lead{color:var(--soft)}
+.kv{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); margin:10px 0}
+.kv > div{background:var(--tint); border-radius:12px; padding:10px 12px}
+.kv b{display:block; font-family:"M PLUS Rounded 1c",sans-serif; font-size:1.05rem}
+.kv .u{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.3rem; color:#6B3FD6}
+.kv span{font-size:.9rem; color:var(--soft)}
+.two{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); align-items:start}
+.figbox{margin:8px 0; background:var(--tint); border-radius:12px; padding:10px}
+.figbox .fig{max-height:300px; max-width:600px; margin:0 auto}
+.cmp{width:100%; border-collapse:collapse; font-size:.92rem; margin:8px 0 12px}
+.cmp th,.cmp td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top}
+.cmp thead th{background:#F0E9FF}
+.cmp tbody th{background:var(--tint); white-space:nowrap}
+.symgrid{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); margin:10px 0}
+.sym{border:1.5px solid var(--line); border-radius:12px; padding:8px 10px 10px; text-align:center; background:#fff}
+.sym svg{width:100%; height:64px; display:block}
+.sym b{display:block; font-family:"M PLUS Rounded 1c",sans-serif; font-size:.9rem; margin-top:4px}
+.sym span{display:block; font-size:.76rem; color:var(--soft); line-height:1.45}
+.rules{padding-left:1.4em; margin:6px 0 12px} .rules li{margin:5px 0}
+.tip{background:#FFF6EA; border-left:4px solid var(--orange); border-radius:8px; padding:9px 12px; font-size:.93rem; margin:10px 0}
+.calc{background:#F0E9FF; border-radius:14px; padding:14px 16px; margin:10px 0 12px}
+.calc label{display:grid; grid-template-columns:4.5em 1fr 4.8em; align-items:center; gap:10px; font-weight:700; margin:6px 0}
+.calc input[type=range]{width:100%; accent-color:#6B3FD6}
+.calc output{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; text-align:right}
+.cres{margin:10px 0 6px; font-size:1.02rem}
+.cres b{font-family:"M PLUS Rounded 1c",sans-serif; font-size:1.45rem; color:#6B3FD6}
+.cbar{height:12px; border-radius:99px; background:#fff; overflow:hidden} #cBar{height:100%; width:0; background:linear-gradient(90deg,#B9A2F5,#6B3FD6); transition:width .15s}
+.lnav{display:flex; gap:10px; margin-top:14px}
+.lnav button{flex:1; font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; border:2px solid var(--violet); border-radius:12px; padding:11px; background:#fff; color:#6B3FD6; cursor:pointer}
+#lNext{background:var(--violet); color:#fff}
+.lnav button:disabled{opacity:.4; cursor:default}
+.boardmini{background:#fff; border-radius:10px}
+
+/* ── 確認テスト ── */
+.qcard{background:#fff; border:2px solid var(--line); border-radius:20px; padding:20px 20px 24px; max-width:860px; margin:0 auto}
+.qcard h2{font-size:1.45rem; margin:0 0 8px}
+.qcard h3{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.05rem; margin:18px 0 8px}
+.qlab{margin:14px 0 4px; font-weight:700; font-size:.9rem; color:var(--soft)}
+.qopts{display:flex; flex-wrap:wrap; gap:6px}
+.qopts button{font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:.9rem; border:2px solid var(--line); background:#fff; color:var(--soft); border-radius:999px; padding:6px 14px; cursor:pointer}
+.qopts button[aria-pressed="true"]{background:var(--orange); border-color:var(--orange); color:#fff}
+.qopts small{font-weight:500; opacity:.85}
+.qtop{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.qno{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; color:#B35A00; font-size:1.1rem}
+.qcat{font-size:.8rem; font-weight:700; background:#FFF0DD; color:#8C4500; border-radius:999px; padding:2px 10px}
+.qbar{height:8px; border-radius:99px; background:var(--tint); overflow:hidden; margin:8px 0 16px} .qbar i{display:block; height:100%; background:var(--orange); transition:width .25s}
+.qq{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.2rem; line-height:1.6; margin:0 0 14px}
+.qfig{background:var(--tint); border-radius:12px; padding:12px; max-width:280px; margin:0 auto 14px}
+.qfig svg{width:100%; height:110px; display:block}
+.qch{display:grid; gap:8px}
+.qch button{font:inherit; text-align:left; font-size:1rem; border:2px solid var(--line); background:#fff; color:var(--ink); border-radius:12px; padding:11px 14px; cursor:pointer; display:flex; gap:10px; align-items:center}
+.qch .k{flex:none; width:28px; height:28px; border-radius:50%; background:var(--tint); display:grid; place-items:center; font:800 .9rem "M PLUS Rounded 1c",sans-serif}
+.qch button:hover:not(:disabled){border-color:var(--orange)}
+.qch button:disabled{cursor:default}
+.qch button.ok{border-color:var(--green); background:#E2F6EA} .qch button.ok .k{background:var(--green); color:#fff}
+.qch button.ng{border-color:var(--red); background:#FFE9E6} .qch button.ng .k{background:var(--red); color:#fff}
+.qex{margin-top:12px; border-radius:12px; padding:12px 14px; font-size:.97rem}
+.qex.ok{background:#E2F6EA; border-left:5px solid var(--green)} .qex.ng{background:#FFE9E6; border-left:5px solid var(--red)}
+.qex b{font-family:"M PLUS Rounded 1c",sans-serif; display:block; margin-bottom:3px; font-size:1.05rem}
+.qgo{margin-top:14px; width:100%; font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.05rem; border:0; border-radius:12px; padding:13px; background:var(--orange); color:#fff; cursor:pointer}
+.qscore{text-align:center; margin:4px 0 10px}
+.qscore .big{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:3.2rem; color:#B35A00; line-height:1.1}
+.qscore p{margin:6px 0 0; font-weight:700}
+.qwrong{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+.qwrong li{background:#FFF6EA; border-radius:10px; padding:10px 12px; font-size:.92rem}
+.qwrong .a{color:#14804A; font-weight:700}
+.qbtns{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px}
+.qbtns button{flex:1 1 180px; font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; border:2px solid var(--orange); border-radius:12px; padding:11px; background:#fff; color:#B35A00; cursor:pointer}
+.qbtns button.main{background:var(--orange); color:#fff}
+.basicsbar{background:#E0F5F8; border:2px solid #9BD8E0; border-radius:18px; padding:14px 16px 16px; margin-bottom:22px}
+.bhead{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+#bNo{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; color:var(--teal); font-size:1rem}
+.bdots{display:flex; flex-wrap:wrap; gap:4px; margin-left:auto}
+.bdot{min-width:26px; height:26px; padding:0 5px; border-radius:13px; border:2px solid #9BD8E0; background:#fff; font:inherit; font-weight:800; font-size:.8rem; color:var(--soft); cursor:pointer; font-family:"M PLUS Rounded 1c",sans-serif}
+.bdot.done{background:#B7E7EE; color:#0C5B66}
+.bdot.on{background:var(--teal); border-color:var(--teal); color:#fff}
+.basicsbar h2{margin:10px 0 4px; font-size:1.35rem}
+.bgoal{margin:0 0 12px}
+.bnav{display:flex; gap:10px}
+.bnav button{flex:1; font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; border:2px solid var(--teal); border-radius:12px; padding:10px; cursor:pointer; background:#fff; color:var(--teal)}
+#bNext{background:var(--teal); color:#fff}
+.bnav button:disabled{opacity:.4; cursor:default}
+.blearn{margin:8px 0 0; background:#E0F5F8; border-left:4px solid var(--teal); border-radius:6px; padding:8px 12px; font-size:.95rem}
+.alwaysmsg{margin:0; font-size:.95rem; color:var(--soft)}
+#cautionList li{cursor:pointer; border-radius:6px; transition:background .1s}
+#cautionList li:hover{background:#FFEFD8}
+#cautionList li.sel{background:#FFE4BF}
+/* 横のパネル */
+.side{display:flex; flex-direction:column; gap:12px}
+.box{background:#fff; border-radius:14px; padding:14px}
+.box h3{margin:0 0 6px; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.05rem}
+#focusInfo{margin:0; font-size:.95rem}
+.steptop{display:flex; justify-content:space-between; align-items:baseline}
+#stepNo{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.5rem; color:var(--orange)}
+.prog{height:8px; border-radius:99px; background:var(--tint); overflow:hidden; margin:6px 0 12px}
+#stepBar{height:100%; background:var(--orange); border-radius:99px; transition:width .25s}
+#stepName{margin:0; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1.12rem}
+#stepHow{margin:4px 0 14px; font-size:1rem}
+.nav{display:flex; gap:8px}
+.nav button{flex:1; font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; border-radius:12px; padding:10px 12px; cursor:pointer; border:2px solid var(--line); background:#fff; color:var(--ink)}
+#nextBtn{background:var(--orange); border-color:var(--orange); color:#fff}
+.nav button:disabled{opacity:.4; cursor:default}
+.nav button:active{transform:scale(.98)}
+/* ためしてみる */
+#tryHint{margin:0 0 10px; font-size:.92rem; color:var(--soft)}
+#tryBtns{display:grid; gap:12px}
+.trow .tl{font-weight:800; font-size:.92rem; margin:0 0 4px; display:flex; align-items:center; gap:6px}
+.trow .tl .ic{width:20px; height:20px}
+.seg2{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.seg2 button,.tbtn{font:inherit; font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; font-size:1rem; border:2px solid var(--line); background:#fff; color:var(--ink); border-radius:12px; padding:10px 8px; cursor:pointer; touch-action:manipulation}
+.seg2 button[aria-pressed="true"]{background:var(--blue); border-color:var(--blue); color:#fff}
+.seg2 button.dark[aria-pressed="true"]{background:#24305A; border-color:#24305A}
+.seg2 button.bright[aria-pressed="true"]{background:#FFD21A; border-color:#E0B400; color:#4A3A00}
+.seg2 button.yes[aria-pressed="true"]{background:var(--red); border-color:var(--red)}
+.tbtn{width:100%}
+.tbtn:active{transform:scale(.98)}
+.tbtn.flash{background:var(--green); border-color:var(--green); color:#fff}
+.tbtn.reset{background:#FFF6CC; border-color:#E0B400; color:#4A3A00; touch-action:none; user-select:none; -webkit-user-select:none}
+.tbtn.reset.held{background:#E0B400; color:#fff}
+.meter{height:14px; border-radius:99px; overflow:hidden; background:var(--tint); margin-top:6px}
+#meter{height:100%; width:0; background:linear-gradient(90deg,#FFD21A,#F28A1E)}
+#meterLab{font-family:"M PLUS Rounded 1c",sans-serif; font-weight:800; margin:12px 0 0}
+#muteRow{margin-top:10px}
+#plist{list-style:none; margin:0; padding:0; font-size:.92rem}
+#plist li{display:flex; justify-content:space-between; gap:8px; padding:5px 0; border-bottom:1px solid var(--line)}
+#plist li:last-child{border-bottom:0}
+#plist b{font-family:"M PLUS Rounded 1c",sans-serif}
+/* 一覧 */
+.allwrap{margin-top:34px}
+.allwrap > p{margin:-4px 0 10px; color:var(--soft); font-size:.92rem}
+.legend{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.86rem; margin:0 0 12px}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.legend i{width:16px; height:16px; border-radius:5px; border:1.5px solid; display:inline-block}
+.ctab{display:grid; grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr)); gap:5px; align-items:stretch; max-width:720px}
+.ch{font-weight:800; font-size:.9rem; text-align:center}
+.ch.g2{grid-column:span 2; border-bottom:2px solid var(--line); padding-bottom:2px}
+.ch.s{font-size:.76rem; color:var(--soft); font-weight:700; line-height:1.3}
+.cl{font-weight:800; display:flex; align-items:center; font-size:.92rem; line-height:1.3}
+.cc{font:inherit; font-size:.84rem; font-weight:700; border:1.5px solid; border-radius:10px; padding:7px 2px; cursor:pointer}
+.cc.print{background:#E5F6EC; color:#106B3B; border-color:#9FD8B7}
+.cc.swap,.cc.new{background:#FFF0DD; color:#8C4500; border-color:#F5C68E}
+.cc.none{background:transparent; border:1.5px dashed var(--line); color:#9AA3B2; text-align:center; cursor:default; font-weight:400; display:flex; align-items:center; justify-content:center}
+.cc.on{outline:3px solid var(--blue); outline-offset:1px}
+.foot{margin:22px 4px 0; font-size:.82rem; color:var(--soft)}
+#toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:#fff; padding:10px 18px; border-radius:999px; font-weight:700; z-index:9; max-width:92vw; text-align:center}
+button:focus-visible,.key:focus-visible{outline:3px solid var(--orange); outline-offset:3px}
+@media (max-width:640px){
+  .page{padding:16px 10px 32px}
+  .top{padding:16px 12px 14px}
+  .logo{width:46px; height:46px}
+  .key{min-height:100px; padding:10px}
+  .key[aria-pressed="true"]{padding:9px}
+  .key .ic{width:32px; height:32px}
+  .key .nm{font-size:1.08rem}
+  .lm button{font-size:.75rem; padding:5px 0}
+  .result{padding:14px 8px 14px; border-radius:18px}
+  .tabs button{font-size:.88rem; padding:7px 10px}
+  .rgrid{padding:10px 8px}
+  #board{min-width:640px}
+  .trying .boardwrap:not(.zoomed) #board{min-width:0}
+  .boardwrap.zoomed #board{min-width:1000px}
+}
+@media (max-width:979px){ .pinboard .rgrid > div:first-child{position:sticky; top:env(safe-area-inset-top,0px); z-index:3; background:var(--mat); padding:4px 0 2px; align-self:start} }
+@media (prefers-reduced-motion: reduce){ .ring,.note{animation:none} .key,.night,#stepBar{transition:none} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <svg class="logo" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M28 11a10 10 0 0 1 10 10v11H18V21a10 10 0 0 1 10-10z" fill="#FFD21A" stroke="#1B2335" stroke-width="2.5"/><rect x="15" y="32" width="26" height="5" rx="1.5" fill="#1B2335"/><path d="M23 37v9M33 37v12" stroke="#1B2335" stroke-width="3" stroke-linecap="round"/></svg>
+    <div><h1 class="r">回路ナビ</h1><p>センサーと動かすものを選ぶと、ブレッドボードの配線図が出てきます。</p></div>
+  </div>
+</header>
+<div class="rail" aria-hidden="true"></div>
+<div class="page">
+  <div class="topmode" role="tablist" aria-label="モード">
+    <button data-top="basics" aria-pressed="true"><span class="tm-n">①</span><span class="tm-t">きほんを学ぶ</span><span class="tm-s">LEDから順にステップ練習</span></button>
+    <button data-top="navi" aria-pressed="false"><span class="tm-n">②</span><span class="tm-t">回路をえらぶ</span><span class="tm-s">センサーと動きを選んで配線図</span></button>
+    <button data-top="learn" aria-pressed="false"><span class="tm-n">③</span><span class="tm-t">しくみを知る</span><span class="tm-s">電流・電圧・半導体・図記号</span></button>
+    <button data-top="quiz" aria-pressed="false"><span class="tm-n">④</span><span class="tm-t">確認テスト</span><span class="tm-s">クイズでふりかえり</span></button>
+  </div>
+
+  <section class="basicsbar" id="basicsBar" hidden aria-label="きほんのステップ">
+    <div class="bhead"><span id="bNo"></span><div id="bDots" class="bdots"></div></div>
+    <h2 class="r" id="bTitle"></h2>
+    <p id="bGoal" class="bgoal"></p>
+    <div class="bnav"><button id="bPrev">◀ もどる</button><button id="bNext">次のステップ ▶</button></div>
+  </section>
+
+  <section class="bex" id="bExplain" hidden aria-label="このステップの解説">
+    <div class="bexh"><span class="bexl">📘 このステップの解説</span><h3 id="exTitle"></h3></div>
+    <div class="exfigs" id="exFigs"></div>
+    <ul class="expts" id="exPts"></ul>
+    <button class="lk" id="exMore" type="button"></button>
+  </section>
+
+  <section class="pick" id="naviPick" aria-label="えらぶ">
+    <div>
+      <h2 class="r"><span class="num n1">1</span>なにに反応させる？<small>（2つまで）</small></h2>
+      <div class="cards four">
+        <div class="key k-light" data-sensor="light" role="button" tabindex="0" aria-pressed="false">
+          <span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><circle cx="24" cy="24" r="8" fill="currentColor"/><g stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M24 5v6M24 37v6M5 24h6M37 24h6M10.6 10.6l4.2 4.2M33.2 33.2l4.2 4.2M10.6 37.4l4.2-4.2M33.2 14.8l4.2-4.2"/></g></svg>
+          <span class="nm">明るさ</span><span class="sb">CdS（光センサー）</span>
+          <span class="lm"><button data-lm="dark" aria-pressed="true">暗いとき</button><button data-lm="bright" aria-pressed="false">明るいとき</button></span>
+        </div>
+        <button class="key k-person" data-sensor="person" aria-pressed="false"><span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><circle cx="24" cy="12" r="7" fill="currentColor"/><path d="M12 44V33a12 12 0 0 1 24 0v11z" fill="currentColor"/></svg>
+          <span class="nm">人</span><span class="sb">人感センサー</span></button>
+        <button class="key k-sound" data-sensor="sound" aria-pressed="false"><span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><rect x="17" y="4" width="14" height="24" rx="7" fill="currentColor"/><path d="M11 22a13 13 0 0 0 26 0M24 35v8M16 44h16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span class="nm">音</span><span class="sb">マイク</span></button>
+        <button class="key k-ir" data-sensor="ir" aria-pressed="false"><span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><rect x="15" y="16" width="18" height="30" rx="4" fill="currentColor"/><circle cx="24" cy="25" r="3" fill="#fff"/><path d="M17 10a10 10 0 0 1 14 0M12 5a17 17 0 0 1 24 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span class="nm">赤外線</span><span class="sb">リモコンの光</span></button>
+      </div>
+    </div>
+    <div>
+      <h2 class="r"><span class="num n2">2</span>なにを動かす？</h2>
+      <div class="cards two">
+        <button class="key k-led" data-out="led" aria-pressed="true"><span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><path d="M24 4a11 11 0 0 1 11 11v13H13V15A11 11 0 0 1 24 4z" fill="currentColor"/><rect x="9" y="28" width="30" height="5" rx="1" fill="currentColor"/><path d="M19 33v11M29 33v14" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span class="nm">LED</span><span class="sb">光らせる</span></button>
+        <button class="key k-mel" data-out="mel" aria-pressed="false"><span class="chk"></span>
+          <svg viewBox="0 0 48 48" class="ic"><path d="M18 36V10l22-5v26" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><ellipse cx="13" cy="37" rx="7" ry="5.5" fill="currentColor"/><ellipse cx="35" cy="32" rx="7" ry="5.5" fill="currentColor"/></svg>
+          <span class="nm">メロディ</span><span class="sb">音を鳴らす</span></button>
+      </div>
+    </div>
+    <div>
+      <h2 class="r"><span class="num n3">3</span>動き方は？</h2>
+      <div class="cards two">
+        <button class="key k-off" data-delay="off" aria-pressed="true"><span class="chk"></span>
+          <span class="nm">オフディレイ</span><span class="sb">すぐ動いて、ゆっくり止まる</span>
+          <svg class="graph" viewBox="0 0 120 34" aria-hidden="true"><line x1="30" y1="2" x2="30" y2="32"/><line x1="62" y1="2" x2="62" y2="32"/><path d="M4 30 H30 V5 H62 Q80 8 92 30 H116"/></svg></button>
+        <button class="key k-on" data-delay="on" aria-pressed="false"><span class="chk"></span>
+          <span class="nm">オンディレイ</span><span class="sb">ゆっくり動きだし、ゆっくり止まる</span>
+          <svg class="graph" viewBox="0 0 120 34" aria-hidden="true"><line x1="22" y1="2" x2="22" y2="32"/><line x1="62" y1="2" x2="62" y2="32"/><path d="M4 30 H22 Q44 28 50 5 H62 Q80 8 92 30 H116"/></svg></button>
+      </div>
+      <p class="hint3">グラフの点線：左はセンサーが反応しはじめたとき、右は反応しなくなったとき。</p>
+    </div>
+  </section>
+
+  <section id="learnSec" hidden aria-label="しくみを知る">
+    <div class="lchips" id="lChips"></div>
+    <article class="lcard" id="lBody"></article>
+    <div class="lnav"><button id="lPrev" type="button">◀ 前の章</button><button id="lNext" type="button">次の章 ▶</button></div>
+  </section>
+
+  <section id="quizSec" hidden aria-label="確認テスト">
+    <div class="qcard" id="qBox" aria-live="polite"></div>
+  </section>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="emptymsg r" id="emptyMsg"></p>
+    <div class="filled">
+      <p id="title"></p>
+      <p class="blearn" id="bLearn"></p>
+      <details class="memo"><summary>先生用メモ</summary><p id="memoText"></p></details>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-view="full" aria-selected="true">完成図</button>
+        <button role="tab" data-view="steps" aria-selected="false">組み立て手順</button>
+        <button role="tab" data-view="try" aria-selected="false">ためしてみる</button>
+      </div>
+      <div class="rgrid">
+        <div>
+          <div class="boardwrap"><svg id="board" viewBox="0 0 740 418" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ブレッドボードの配線図"></svg><div id="notes"></div></div>
+          <div class="btools"><span id="scrollHint" hidden>◀ 横にずらすと右側も見られます ▶</span><button class="small-btn" id="zoom" aria-pressed="false">大きく見る</button></div>
+          <div class="caution" id="caution" hidden><h3>⚠ 向きに気をつける部品</h3><ul id="cautionList"></ul><p class="cnote">下の部品をタップすると、その部品がボードのどこにあるか光ってわかります。</p></div>
+        </div>
+        <div class="side">
+          <div class="box" id="fullPane"><h3>部品をタップ</h3><p id="focusInfo"></p></div>
+          <div class="box" id="stepPane" hidden>
+            <div class="steptop"><h3>組み立て手順</h3><span id="stepNo"></span></div>
+            <div class="prog"><div id="stepBar"></div></div>
+            <p id="stepName"></p><p id="stepHow"></p>
+            <div class="nav"><button id="prevBtn">もどる</button><button id="nextBtn">次へ</button></div>
+          </div>
+          <div class="box" id="tryPane" hidden>
+            <h3>ためしてみる</h3>
+            <p id="tryHint"></p>
+            <div id="tryBtns"></div>
+            <p id="meterLab"></p><div class="meter"><div id="meter"></div></div>
+            <div id="muteRow"><button class="small-btn" id="mute" aria-pressed="false">音を消す</button></div>
+          </div>
+          <div class="box"><h3>使う部品</h3><ul id="plist"></ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">半固定抵抗の足は部品の下にかくれていて見えないため、穴の位置は目安です。「ためしてみる」の動きは、回路のしくみをわかりやすくしたものです。</p>
+</div>
+<div id="toast" hidden role="status"></div>
+<script>
+// ===== 回路データ（プリントの配置図を読み取り） =====
+const W=(a,b)=>({t:'wire',a,b});
+const R=(v,a,b)=>({t:'res',v,a,b});
+const TR=(name,pins,body)=>({t:'tr',name,pins,body:body||'down'});
+const VR=(v,e1,w,e2,notch)=>({t:'vr',v,pins:[e1,w,e2],notch:notch||'down'});
+const CAP=(v,plus,minus)=>({t:'cap',v,plus,minus});
+const SW=(a,b,c,d)=>({t:'sw',pins:[a,b,c,d]});
+const LED=(plus,minus)=>({t:'led',plus,minus});
+const LED_A=()=>[W('X23','A23'),W('A19','A22'),W('E22','F22'),W('E23','F23'),LED('B23','B22'),LED('D23','D22'),LED('G23','G22'),LED('I23','I22')];
+const LED_B=()=>[W('X23','A23'),W('A20','A22'),W('E22','F22'),W('E23','F23'),LED('B23','B22'),LED('D23','D22'),LED('G23','G22'),LED('I23','I22')];
+const MEL_A=()=>[W('A19','A21'),R('150','X22','B22'),{t:'mel',pins:['D21','D22','D23'],body:'up'},{t:'spk',a:'E23',b:'Y23'}];
+const MEL_B=()=>[W('E20','F21'),W('E22','F22'),R('150','X22','B22'),{t:'mel',pins:['H21','H22','H23'],body:'down'},{t:'spk',a:'J23',b:'Y23'}];
+
+const BASES={
+ r1:{src:'参考①', sensors:{light:'dark'}, slowRise:false,
+   parts:[W('X4','A4'),W('X11','A11'),W('X17','A17'),W('E5','F5'),W('E10','F10'),W('E12','F12'),W('E20','Y20'),W('F13','F18'),W('G12','G13'),W('J7','Y7'),W('J11','Y11'),W('J19','Y19'),
+     VR('100k','D3','B4','D5'),R('10k','X10','C10'),R('22k','A12','A16'),TR('1015',['D10','D11','D12']),TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),
+     R('10k','G6','G10'),TR('1815',['H5','H6','H7']),CAP('47µF','H12','H11'),SW('J12','J14','Y12','Y14'),{t:'cds',a:'J5',b:'Y5'},VR('1M','I17','G18','I19')],
+   stage:'A', native:'led'},
+ r2:{src:'参考②', sensors:{person:true,light:'bright'}, slowRise:true,
+   parts:[W('X3','A3'),W('X10','A10'),W('X17','A17'),W('A11','A12'),W('D13','D15'),W('E5','Y5'),W('E12','F12'),W('E13','F13'),W('E15','F15'),W('E20','Y20'),W('J10','Y10'),W('J14','Y14'),
+     {t:'pir',vp:'C3',vo:'D4',vm:'C5'},R('10k','A4','A8'),{t:'cds',a:'E8',b:'F8'},R('10k','X9','B9'),R('10k','D9','F9'),TR('1015',['C9','C10','C11']),
+     TR('1815',['G8','G9','G10']),R('4.7k','I8','Y8'),VR('1M','I11','G12','I13'),R('22k','A13','A16'),CAP('47µF','H15','H14'),SW('J15','J17','Y15','Y17'),
+     TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20'])],
+   stage:'A', native:'mel'},
+ r3:{src:'参考③', sensors:{sound:true}, slowRise:false,
+   parts:[W('A3','A4'),W('C8','C10'),W('E3','Y3'),W('E9','Y9'),W('X11','A11'),W('X17','A17'),W('E12','F12'),W('E20','Y20'),W('F13','F18'),W('G12','G13'),W('J11','Y11'),W('J19','Y19'),
+     R('1k','X5','B5'),R('200k','X7','B7'),R('10k','X8','B8'),CAP('1µF','C5','C7'),{t:'mic',plus:'E5',minus:'E4'},TR('1815',['D7','D8','D9']),TR('1815',['D10','D11','D12']),
+     R('22k','A12','A16'),TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),CAP('47µF','H12','H11'),SW('J12','J14','Y12','Y14'),VR('1M','I17','G18','I19')],
+   stage:'A', native:'led'},
+ r4:{src:'参考④', sensors:{ir:true}, slowRise:false,
+   parts:[W('X4','A4'),W('X8','A8'),W('X17','A17'),W('D9','D12'),W('E5','F5'),W('E12','F12'),W('E20','Y20'),W('F13','F18'),W('G12','G13'),W('J11','Y11'),W('J19','Y19'),
+     {t:'ir',vp:'C4',vm:'C5',vo:'C6'},R('4.7k','E6','E10'),TR('1015',['C8','C9','C10'],'up'),R('10k','I5','Y5'),R('22k','A12','A16'),
+     TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),CAP('47µF','H12','H11'),SW('J12','J14','Y12','Y14'),VR('1M','I17','G18','I19')],
+   stage:'A', native:'led'},
+ r5:{src:'参考⑤', sensors:{person:true,light:'dark'}, slowRise:false,
+   parts:[W('X3','A3'),W('X13','A13'),W('X19','A18'),W('C11','C12'),W('E5','F5'),W('E7','F7'),W('E12','F12'),W('E14','F14'),W('E21','Y21'),W('F15','F19'),W('G14','G15'),W('J5','Y5'),W('J9','Y9'),W('J13','Y13'),W('J20','Y20'),
+     {t:'pir',vp:'C3',vo:'D4',vm:'C5'},R('10k','A4','A8'),VR('100k','B7','D8','B9','up'),R('10k','X11','B11'),TR('1015',['D12','D13','D14']),R('22k','A14','A17'),
+     TR('1815',['B17','B18','B19']),TR('1815',['D19','D20','D21']),R('10k','G8','G12'),TR('1815',['H7','H8','H9']),{t:'cds',a:'J7',b:'Y7'},
+     CAP('47µF','H14','H13'),SW('J15','J17','Y15','Y17'),VR('1M','I18','G19','I20')],
+   stage:'B', native:'led'},
+ r6:{src:'参考⑥', sensors:{sound:true,light:'dark'}, slowRise:false,
+   parts:[W('X3','A3'),W('X5','A5'),W('X13','A13'),W('B13','B18'),W('C10','C12'),W('E7','F7'),W('E11','Y11'),W('E14','F14'),W('E21','Y21'),W('F15','F19'),W('G14','G15'),W('J5','Y5'),W('J6','J7'),W('J8','Y8'),W('J13','Y13'),W('J20','Y20'),
+     R('10k','X4','B4'),TR('1015',['C4','C5','C6']),R('200k','X9','B9'),R('10k','X10','B10'),CAP('1µF','C7','C9'),TR('1815',['D9','D10','D11']),TR('1815',['D12','D13','D14']),
+     R('22k','A14','A17'),TR('1815',['C17','C18','C19']),TR('1815',['D19','D20','D21']),
+     R('68k','E3','G3'),R('10k','E4','G4'),R('1k','E6','G6'),{t:'mic',plus:'I7',minus:'I8'},TR('1815',['I3','I4','I5']),{t:'cds',a:'J3',b:'Y3'},
+     CAP('47µF','H14','H13'),SW('J14','J16','Y14','Y16'),VR('1M','I18','G19','I20')],
+   stage:'B', native:'led'},
+ r7:{src:'参考⑦', sensors:{person:true}, slowRise:true,
+   parts:[W('X3','A3'),W('X17','A17'),W('A9','A13'),W('D13','D15'),W('E5','Y5'),W('E15','F15'),W('E20','Y20'),W('J14','Y14'),
+     {t:'pir',vp:'C3',vo:'D4',vm:'C5'},R('10k','A4','A8'),VR('1M','E7','C8','E9'),R('22k','C13','C16'),
+     TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),CAP('47µF','H15','H14'),SW('J15','J17','Y15','Y17')],
+   stage:'A', native:'mel'}
+};
+// 参考⑤⑥型（出力トランジスタが1列右）をメロディにするときは、
+// 出力トランジスタを1列左へ寄せて、参考②⑦と同じメロディ部分をつなぐ（線が部品の上を通らないように）
+function shiftDriverB(parts){
+  const s=JSON.stringify;
+  const isQ2_5=p=>p.t==='tr'&&s(p.pins)===s(['B17','B18','B19']);
+  const isQ2_6=p=>p.t==='tr'&&s(p.pins)===s(['C17','C18','C19']);
+  const kind6=parts.some(isQ2_6);
+  const drop=p=> (p.t==='res'&&p.v==='22k'&&p.a==='A14'&&p.b==='A17') || isQ2_5(p) || isQ2_6(p) ||
+    (p.t==='tr'&&s(p.pins)===s(['D19','D20','D21'])) || (p.t==='wire'&&((p.a==='X19'&&p.b==='A18')||(p.a==='B13'&&p.b==='B18')||(p.a==='E21'&&p.b==='Y21')));
+  const add=[R('22k','A14','A16'), kind6?TR('1815',['C16','C17','C18']):TR('1815',['B16','B17','B18']), kind6?W('B13','B17'):W('X17','A17'),
+    TR('1815',['D18','D19','D20']), W('E20','F20')];
+  return parts.filter(p=>!drop(p)).concat(add);
+}
+function buildCircuit(id,out){
+  const b=BASES[id];
+  if(out==='led') return b.parts.concat(b.stage==='A'?LED_A():LED_B());
+  return (b.stage==='A'?b.parts:shiftDriverB(b.parts)).concat(MEL_A());
+}
+
+// ===== プリントにない新しい回路（アプリで設計） =====
+(function(){
+  const without=(parts,drop)=>parts.filter(p=>!drop.some(d=>JSON.stringify(d)===JSON.stringify(p)));
+  const r1=BASES.r1.parts, r6=BASES.r6.parts;
+  const RIGHT4=[W('X17','A17'),W('E12','F12'),W('E20','Y20'),W('F13','F18'),W('G12','G13'),W('J11','Y11'),W('J19','Y19'),
+    R('22k','A12','A16'),TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),CAP('47µF','H12','H11'),SW('J12','J14','Y12','Y14'),VR('1M','I17','G18','I19')];
+  const IRFRONT=[{t:'ir',vp:'C2',vm:'C3',vo:'C4'},W('X2','A2'),W('E3','F3'),R('10k','I3','Y3'),R('4.7k','D4','D8'),TR('1015',['C6','C7','C8'],'up'),
+    W('X6','A6'),W('E6','F6'),W('G6','G8'),TR('1815',['H7','H8','H9']),W('E9','F9'),W('D9','D12')];
+  Object.assign(BASES,{
+    n1:{src:'参考①', isNew:true, change:'CdSと100kΩの半固定抵抗の役わりを入れかえて、明るいときに反応するようにしました。', sensors:{light:'bright'}, slowRise:false,
+      parts: without(r1,[W('X4','A4'),{t:'cds',a:'J5',b:'Y5'}]).concat([W('E4','Y4'),{t:'cds',a:'X5',b:'A5'}]), stage:'A', native:'led'},
+    n2:{src:'参考⑥', isNew:true, change:'CdSと68kΩの抵抗の位置を入れかえて、明るいときに反応するようにしました。', sensors:{sound:true,light:'bright'}, slowRise:false,
+      parts: without(r6,[R('68k','E3','G3'),{t:'cds',a:'J3',b:'Y3'}]).concat([{t:'cds',a:'E3',b:'G3'},R('68k','J3','Y3')]), stage:'B', native:'led'},
+    n3:{src:'参考⑥', isNew:true, change:'「暗い」を見る部分を人感センサーに取りかえ、人がいるときだけマイクに電気が届くようにしました。', sensors:{person:true,sound:true}, slowRise:false,
+      parts: without(r6,[R('68k','E3','G3'),R('10k','E4','G4'),TR('1815',['I3','I4','I5']),{t:'cds',a:'J3',b:'Y3'},W('J5','Y5'),R('10k','X4','B4'),TR('1015',['C4','C5','C6']),W('X5','A5')])
+        .concat([{t:'pir',vp:'C3',vo:'D4',vm:'C5'},W('E5','Y5'),W('A4','A6')]), stage:'B', native:'led'},
+    n4:{src:'参考④', isNew:true, change:'赤外線で入った電気を、暗いときだけ先に通すトランジスタを1つ加えました。', sensors:{ir:true,light:'dark'}, slowRise:false,
+      parts: IRFRONT.concat([R('10k','E7','F7'),{t:'cds',a:'J7',b:'Y7'}],RIGHT4), stage:'A', native:'led'},
+    n5:{src:'参考④', isNew:true, change:'赤外線で入った電気を、明るいときだけ先に通すトランジスタを1つ加えました。', sensors:{ir:true,light:'bright'}, slowRise:false,
+      parts: IRFRONT.concat([{t:'cds',a:'E7',b:'F7'},R('10k','J7','Y7')],RIGHT4), stage:'A', native:'led'},
+    n6:{src:'参考④', isNew:true, change:'A1015の＋側を人感センサーの出力につなぎ、人がいるときだけ赤外線に反応するようにしました。', sensors:{person:true,ir:true}, slowRise:false,
+      parts:[{t:'pir',vp:'C2',vo:'D3',vm:'C4'},W('X2','A2'),W('E4','Y4'),R('1k','A3','A6'),TR('1015',['C6','C7','C8'],'up'),R('4.7k','D8','D11'),
+        {t:'ir',vp:'C9',vm:'C10',vo:'C11'},W('X9','A9'),W('E10','F10'),R('10k','J10','Y10'),W('E7','F7'),W('I7','I12')].concat(RIGHT4), stage:'A', native:'led'}
+  });
+})();
+
+// ===== オンディレイ／オフディレイの切りかえ =====
+(function(){
+  const s=JSON.stringify; const has=(list,p)=>list.some(q=>s(q)===s(p));
+  const RIGHT4=[W('X17','A17'),W('E12','F12'),W('E20','Y20'),W('F13','F18'),W('G12','G13'),W('J11','Y11'),W('J19','Y19'),
+    R('22k','A12','A16'),TR('1815',['B16','B17','B18']),TR('1815',['D18','D19','D20']),CAP('47µF','H12','H11'),SW('J12','J14','Y12','Y14'),VR('1M','I17','G18','I19')];
+  const BACK_ON=[W('E12','F12'),VR('1M','I11','G12','I13'),W('E13','F13'),R('22k','A13','A16'),W('D13','D15'),W('E15','F15'),CAP('47µF','H15','H14'),W('J14','Y14'),
+    SW('J15','J17','Y15','Y17'),TR('1815',['B16','B17','B18']),W('X17','A17'),TR('1815',['D18','D19','D20']),W('E20','Y20')];
+  const FRONT1=BASES.r1.parts.filter(p=>!has(RIGHT4,p));
+  const FRONT1B=BASES.n1.parts.filter(p=>!has(RIGHT4,p));
+  const FRONT2=BASES.r2.parts.filter(p=>!has(BACK_ON,p) && !(p.t==='wire'&&p.a==='A11'&&p.b==='A12'));
+  const swap2=FRONT2.map(p=> p.t==='cds'&&p.a==='E8' ? R('68k','E8','F8') : (p.t==='res'&&p.v==='4.7k'&&p.a==='I8') ? {t:'cds',a:'I8',b:'Y8'} : p);
+  for(const k in BASES) BASES[k].delay = (k==='r2'||k==='r7')?'on':'off';
+  Object.assign(BASES,{
+    r1on:{src:'参考①',isNew:true,delay:'on',sensors:{light:'dark'},slowRise:true,stage:'A',native:'led',
+      change:'1MΩの半固定抵抗を、コンデンサと並ぶ位置から「電気が流れこむ道の途中」へ移しました（参考②と同じ形）。',
+      parts:FRONT1.concat(BACK_ON)},
+    n1on:{src:'参考①',isNew:true,delay:'on',sensors:{light:'bright'},slowRise:true,stage:'A',native:'led',
+      change:'CdSと100kΩの半固定抵抗の役わりを入れかえ、1MΩの半固定抵抗を「電気が流れこむ道の途中」へ移しました。',
+      parts:FRONT1B.concat(BACK_ON)},
+    r5on:{src:'参考②',isNew:true,delay:'on',sensors:{person:true,light:'dark'},slowRise:true,stage:'A',native:'mel',
+      change:'参考②のCdSを68kΩに、4.7kΩをCdSに取りかえて、暗いときに反応するようにしました。',
+      parts:swap2.concat([W('A11','A12')],BACK_ON)},
+    r2off:{src:'参考②',isNew:true,delay:'off',sensors:{person:true,light:'bright'},slowRise:false,stage:'A',native:'mel',
+      change:'1MΩの半固定抵抗を、コンデンサと並ぶ位置へ移しました（参考①と同じ形）。',
+      parts:FRONT2.concat([W('B11','B12')],RIGHT4)},
+    r7off:{src:'参考⑦',isNew:true,delay:'off',sensors:{person:true},slowRise:false,stage:'A',native:'mel',
+      change:'人感センサーの出力でトランジスタ（C1815）を1つ動かし、コンデンサにためた電気が人感センサーへもどらないようにしました。1MΩの半固定抵抗はコンデンサと並ぶ位置です。',
+      parts:[{t:'pir',vp:'C3',vo:'D4',vm:'C5'},W('X3','A3'),W('E5','Y5'),R('10k','A4','A8'),TR('1815',['D8','D9','D10']),W('X9','A9'),W('B10','B12')].concat(RIGHT4)}
+  });
+})();
+
+// ===== きほんの練習（ステップ1〜11） =====
+const BASICS=(function(){
+  const L=(plus,minus)=>({t:'led',plus,minus});
+  const S=[];
+  const add=o=>{ S.push(o); return o; };
+  add({n:1,title:'LEDを光らせてみよう①',goal:'電池のプラスとマイナスを、LEDでつなぐ。これだけで光ります。',out:'led',always:true,
+    learn:'LEDには向き（＋の長い足・−の短い足）があります。逆だと光りません。',
+    parts:[W('X10','A10'),L('E10','F10'),W('H10','Y10')]});
+  add({n:2,title:'LEDを光らせてみよう②（2個にするには？）',goal:'LEDを2個、1本道（直列）につないでみよう。……あれ？ 光らない！',out:'led',always:true,noLight:true,
+    learn:'1本道（直列）だと、電池の電圧を2個のLEDで分け合うので、1個あたりの電圧が足りなくなって光りません。では、2個とも光らせるには？ ➡ 次のステップへ。',
+    parts:[L('X10','A10'),W('D10','G10'),L('J10','Y10')]});
+  add({n:3,title:'LEDを光らせてみよう③（並列）',goal:'道を2本に分けて（並列）、LEDを1個ずつつなぐ。こんどは2個とも光ります！',out:'led',always:true,
+    learn:'並列は道が分かれていて、どのLEDにも電池の電圧がそのままかかります。だから2個とも光り、1個外れても、もう1個は光ったままです。',
+    parts:[W('X10','A10'),L('E10','F10'),W('H10','Y10'), W('X13','A13'),L('E13','F13'),W('H13','Y13')]});
+  add({n:4,title:'LEDを光らせてみよう④（並列4個）',goal:'ステップ③と同じやり方で道を4本にして、LEDを4個まで並列にふやす。',out:'led',always:true,
+    learn:'並列なら、道をふやすだけでLEDをふやせます。どれも同じ明るさで光ります（そのぶん、電池から流れ出る電流はふえます）。',
+    parts:[W('X8','A8'),L('E8','F8'),W('H8','Y8'), W('X11','A11'),L('E11','F11'),W('H11','Y11'),
+           W('X14','A14'),L('E14','F14'),W('H14','Y14'), W('X17','A17'),L('E17','F17'),W('H17','Y17')]});
+  add({n:5,title:'抵抗器を入れてみよう①（固定抵抗器）',goal:'LEDの前に抵抗器を入れて、流れる電気の量をおさえる。',out:'led',always:true,
+    learn:'抵抗器は電気の流れをおさえる部品です。LEDを守ったり、明るさを調整したりします。',
+    parts:[R('fix','X10','C10'), L('E10','F10'), W('H10','Y10'),
+           W('X13','A13'), L('E13','F13'), W('H13','Y13')]});
+  add({n:6,title:'抵抗器を入れてみよう②（半固定ボリューム）',goal:'つまみで抵抗を変えられる「半固定ボリューム」を使う。',out:'led',always:true,
+    learn:'半固定ボリュームは、つまみを回すと抵抗が変わる部品です。明るさを自由に変えられます。',
+    parts:[VR('100k','D7','B8','D9'), W('X9','A9'),
+           L('E8','F8'), W('H8','Y8'), W('X12','A12'), L('E12','F12'), W('H12','Y12')]});
+  add({n:7,title:'暗くなったらLEDをつけよう①',goal:'CdSとトランジスタを使って、暗くなると自動でLEDがつく回路。',out:'led',sensors:{light:'dark'},
+    learn:'トランジスタは「小さな電気で大きな電気を切りかえるスイッチ」。CdSが暗さを感じ、トランジスタがLEDをONにします。',
+    parts:[W('X9','A9'), R('68k','X8','C8'), W('E8','F8'), L('E9','F9'),
+           TR('1815',['H8','H9','H10']), {t:'cds',a:'J8',b:'Y8'}, W('J10','Y10')]});
+  add({n:8,title:'暗くなったらLEDをつけよう②（感度調整）',goal:'固定抵抗を半固定ボリュームに変えて、反応する暗さを調整できるようにする。',out:'led',sensors:{light:'dark'},
+    learn:'半固定ボリュームにすると、「どれくらい暗くなったらつくか」をつまみで調整できます。',
+    parts:[W('X9','A9'), VR('100k','D7','B8','D9'), W('E8','F8'), L('E9','F9'),
+           TR('1815',['H8','H9','H10']), {t:'cds',a:'J8',b:'Y8'}, W('J10','Y10')]});
+  add({n:9,title:'人に反応してLEDをつけよう',goal:'人感センサーを使って、人が近づくとLEDがつく回路。',out:'led',sensors:{person:true},
+    learn:'人感センサーは、人の動きを感じると電気を送り出します。CdSのかわりに人を感じるセンサーです。',
+    parts:[{t:'pir',vp:'C3',vo:'D4',vm:'C5'}, W('X3','A3'), W('E5','Y5'),
+           R('10k','A4','A7'), L('E7','F7'), W('H7','Y7')]});
+  add({n:10,title:'メロディを流してみよう',goal:'LEDのかわりにメロディICとスピーカーをつなぎ、音を鳴らす。',out:'mel',always:true,
+    learn:'メロディICは電気が流れると曲を鳴らす部品です。スピーカーから音が出ます。向きに注意。',
+    parts:[R('200k','X16','A16'), W('X17','A17'), TR('1815',['B16','B17','B18']),
+           TR('1815',['D18','D19','D20']), W('E20','Y20')].concat(MEL_A())});
+  add({n:'11-1',title:'ステップ11-1　オンディレイ回路',goal:'人を感じると、コンデンサに電気がたまってから「じわっと」メロディが鳴りはじめる回路（プリントの上の回路）。',out:'mel',sensors:{person:true},slowRise:true,
+    learn:'コンデンサは電気を少しずつためる部品。たまるまで時間がかかるので、反応が「ゆっくり」はじまります。1MΩのつまみで速さを変え、ボタンでリセットできます。',
+    parts:buildCircuit('r7','mel')});
+  add({n:'11-2',title:'ステップ11-2　オフディレイ回路',goal:'人がいなくなっても、コンデンサの電気がなくなるまで「じわっと」LEDが光りつづける回路（プリントの下の回路）。',out:'led',sensors:{person:true},
+    learn:'コンデンサにたまった電気が少しずつ出ていくので、反応が「ゆっくり」止まります。これが回路ナビの「動き方（オフディレイ・オンディレイ）」です。',
+    parts:buildCircuit('r7off','led')});
+  return S;
+})();
+if(typeof module!=='undefined') module.exports={BASES,buildCircuit,BASICS};
+// ===== 表示 =====
+const ROWS='XABCDEFGHIJY';
+const YR=[34,74,100,126,152,178,236,262,288,314,340,380];
+const XC=c=>24+(c-1)*26;
+const P=s=>[XC(+s.slice(1)), YR[ROWS.indexOf(s[0])]];
+const HN=s=>s[0]+'-'+s.slice(1);
+const $=s=>document.querySelector(s);
+const BAND={black:'#1f1f1f',brown:'#8B4A1E',red:'#D9312B',orange:'#F08A24',yellow:'#F5D000',green:'#1FA34A',blue:'#1E6FD9',violet:'#8A3FD1',gray:'#9A9A9A',gold:'#C9A227'};
+const RES={'10k':{lab:'10kΩ',b:['brown','black','orange'],t:'茶・黒・橙'},'22k':{lab:'22kΩ',b:['red','red','orange'],t:'赤・赤・橙'},'4.7k':{lab:'4.7kΩ',b:['yellow','violet','red'],t:'黄・紫・赤'},
+ '200k':{lab:'200kΩ',b:['red','black','yellow'],t:'赤・黒・黄'},'68k':{lab:'68kΩ',b:['blue','gray','orange'],t:'青・灰・橙'},'1k':{lab:'1kΩ',b:['brown','black','red'],t:'茶・黒・赤'},'150':{lab:'150Ω',b:['brown','green','brown'],t:'茶・緑・茶'},'fix':{lab:'抵抗器',b:['gray','gray','gray'],t:'値はお好みで'}};
+
+const SENS={light:'明るさ（CdS）',person:'人感センサー',sound:'マイク（音）',ir:'赤外線受光センサー'};
+const DESC={
+ r1:{led:['暗くなるとLEDが点灯し、明るくなると徐々に消灯する。'],mel:['暗くなるとメロディが流れ、明るくなると徐々に消音する。']},
+ r2:{mel:['人がいて、明るいと徐々にメロディが流れ出す。人がいない、または暗いと徐々に消音する。'],led:['人がいて、明るいと徐々にLEDが点灯する。人がいない、または暗いと徐々に消灯する。']},
+ r3:{led:['音がするとLEDが点灯し、音がなくなると徐々に消灯する。'],mel:['音がするとメロディが流れ、音がなくなると徐々に消音する。']},
+ r4:{led:['赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。'],mel:['赤外線を受光するとメロディが流れ、その後、赤外線がないと徐々に消音する。']},
+ r5:{led:['人がいて、暗いとLEDが点灯し、人がいないまたは明るいと徐々に消灯する。'],mel:['人がいて、暗いとメロディが流れ、人がいないまたは明るいと徐々に消音する。']},
+ r6:{led:['暗くて、音がするとLEDが点灯し、明るいまたは音がしないと徐々に消灯する。'],mel:['暗くて、音がするとメロディが流れ、明るいまたは音がしないと徐々に消音する。']},
+ r7:{mel:['人がいると徐々にメロディが流れ出す。人がいないと、徐々に消音する。'],led:['人がいると徐々にLEDが点灯する。人がいないと、徐々に消灯する。']},
+ n1:{led:['明るくなるとLEDが点灯し、暗くなると徐々に消灯する。'],mel:['明るくなるとメロディが流れ、暗くなると徐々に消音する。']},
+ n2:{led:['明るくて、音がするとLEDが点灯し、暗いまたは音がしないと徐々に消灯する。'],mel:['明るくて、音がするとメロディが流れ、暗いまたは音がしないと徐々に消音する。']},
+ n3:{led:['人がいて、音がするとLEDが点灯し、人がいないまたは音がしないと徐々に消灯する。'],mel:['人がいて、音がするとメロディが流れ、人がいないまたは音がしないと徐々に消音する。']},
+ n4:{led:['暗いときに赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。'],mel:['暗いときに赤外線を受光するとメロディが流れ、その後、赤外線がないと徐々に消音する。']},
+ n5:{led:['明るいときに赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。'],mel:['明るいときに赤外線を受光するとメロディが流れ、その後、赤外線がないと徐々に消音する。']},
+ n6:{led:['人がいるときに赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。'],mel:['人がいるときに赤外線を受光するとメロディが流れ、その後、赤外線がないと徐々に消音する。']},
+ r1on:{led:['暗くなると徐々にLEDが点灯し、明るくなると徐々に消灯する。'],mel:['暗くなると徐々にメロディが流れ出し、明るくなると徐々に消音する。']},
+ n1on:{led:['明るくなると徐々にLEDが点灯し、暗くなると徐々に消灯する。'],mel:['明るくなると徐々にメロディが流れ出し、暗くなると徐々に消音する。']},
+ r5on:{led:['人がいて、暗いと徐々にLEDが点灯し、人がいないまたは明るいと徐々に消灯する。'],mel:['人がいて、暗いと徐々にメロディが流れ出す。人がいないまたは明るいと徐々に消音する。']},
+ r2off:{led:['人がいて、明るいとLEDが点灯し、人がいないまたは暗いと徐々に消灯する。'],mel:['人がいて、明るいとメロディが流れ、人がいないまたは暗いと徐々に消音する。']},
+ r7off:{led:['人がいるとLEDが点灯し、人がいないと徐々に消灯する。'],mel:['人がいるとメロディが流れ、人がいないと徐々に消音する。']}
+};
+const NO_SI='音と赤外線は、どちらも一瞬だけ反応するセンサーです。2つが同じ瞬間にそろうことがほとんどないので、回路を作っても実際にはほぼ動きません。そのため、この組み合わせは用意していません。';
+const COMBOS=[
+ {k:{light:true,lightMode:'dark'},lab:'暗い',off:'r1',on:'r1on'},{k:{light:true,lightMode:'bright'},lab:'明るい',off:'n1',on:'n1on'},
+ {k:{person:true},lab:'人',off:'r7off',on:'r7'},{k:{sound:true},lab:'音',off:'r3'},{k:{ir:true},lab:'赤外線',off:'r4'},
+ {k:{person:true,light:true,lightMode:'dark'},lab:'人＋暗い',off:'r5',on:'r5on'},{k:{person:true,light:true,lightMode:'bright'},lab:'人＋明るい',off:'r2off',on:'r2'},
+ {k:{sound:true,light:true,lightMode:'dark'},lab:'音＋暗い',off:'r6'},{k:{sound:true,light:true,lightMode:'bright'},lab:'音＋明るい',off:'n2'},
+ {k:{person:true,sound:true},lab:'人＋音',off:'n3'},
+ {k:{ir:true,light:true,lightMode:'dark'},lab:'赤外線＋暗い',off:'n4'},{k:{ir:true,light:true,lightMode:'bright'},lab:'赤外線＋明るい',off:'n5'},
+ {k:{person:true,ir:true},lab:'人＋赤外線',off:'n6'},{k:{sound:true,ir:true},lab:'音＋赤外線',off:null}
+];
+const NO_ON='音や赤外線は一瞬しか反応しないので、ゆっくり動きだす前に反応が終わってしまいます。オンディレイは「明るさ」と「人」の組み合わせで選べます。';
+
+// ---- 選択状態 ----
+const sel={light:false,lightMode:'dark',person:false,sound:false,ir:false,out:'led',delay:'off'};
+let topMode='basics', bStep=0, hilite=[], learnCh='current';
+let view='full', step=0, current=null, focusIdx=-1;
+
+function resolve(){
+  const n=['light','person','sound','ir'].filter(k=>sel[k]).length;
+  if(n===0) return {none:'センサーを1つか2つ選んでください。'};
+  if(sel.sound && sel.ir) return {none:NO_SI};
+  for(const c of COMBOS){
+    const want={light:false,person:false,sound:false,ir:false,...c.k};
+    if(['light','person','sound','ir'].every(k=>!!want[k]===!!sel[k]) && (!want.light || want.lightMode===sel.lightMode)){
+      const id=c[sel.delay]; return id?{id}:{none: sel.delay==='on'?NO_ON:'この組み合わせの回路はありません。'};
+    }
+  }
+  return {none:'この組み合わせの回路はありません。'};
+}
+function kindOf(id,out){ const b=BASES[id]; if(!b) return 'none'; if(b.isNew) return 'new'; return b.native===out?'print':'swap'; }
+const momentary=()=>sel.sound||sel.ir;
+function renderAll(){}
+// ---- 部品の描画 ----
+function legs(a,b){ const [ax,ay]=P(a),[bx,by]=P(b); return `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="leg"/><circle cx="${ax}" cy="${ay}" r="2.8" class="ft"/><circle cx="${bx}" cy="${by}" r="2.8" class="ft"/>`; }
+function partSVG(p,i){
+  let s='';
+  const mid=(a,b)=>{const [ax,ay]=P(a),[bx,by]=P(b); return [(ax+bx)/2,(ay+by)/2,Math.atan2(by-ay,bx-ax)*180/Math.PI];};
+  switch(p.t){
+    case 'wire':{ const [ax,ay]=P(p.a),[bx,by]=P(p.b); s=`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" class="wire"/><circle cx="${ax}" cy="${ay}" r="2.6" class="wend"/><circle cx="${bx}" cy="${by}" r="2.6" class="wend"/>`; break; }
+    case 'res':{ const [mx,my,a]=mid(p.a,p.b); const r=RES[p.v];
+      s=legs(p.a,p.b)+`<g transform="translate(${mx} ${my}) rotate(${a})"><rect x="-15" y="-5.5" width="30" height="11" rx="5" class="rb"/>`+
+        r.b.map((c,k)=>`<rect x="${-10+k*5}" y="-5.5" width="3" height="11" fill="${BAND[c]}"/>`).join('')+`<rect x="9" y="-5.5" width="2.5" height="11" fill="${BAND.gold}"/></g>`;
+      const vert=Math.abs(Math.abs(a)-90)<20; s+= vert?`<text x="${mx+9}" y="${my}" class="pl" transform="rotate(90 ${mx+9} ${my})" dy="-1">${r.lab}</text>`:`<text x="${mx}" y="${my-10}" class="pl">${r.lab}</text>`; break; }
+    case 'cds':{ const [mx,my,a]=mid(p.a,p.b); const vert=Math.abs(Math.abs(a)-90)<20;
+      s=legs(p.a,p.b)+`<circle cx="${mx}" cy="${my}" r="9" class="cds"/><path d="M${mx-4.5} ${my-4} h7 v2.7 h-7 v2.7 h7 v2.7 h-7" class="cdsl"/>`+
+        (vert?`<text x="${mx-12}" y="${my+3}" class="pl" text-anchor="end">CdS</text>`:`<text x="${mx}" y="${my-12}" class="pl">CdS</text>`); break; }
+    case 'cap':{ const [mx,my]=mid(p.plus,p.minus); const [px,py]=P(p.plus); s=legs(p.plus,p.minus)+`<circle cx="${mx}" cy="${my}" r="${p.v==='1µF'?8:10}" class="capring"/><text x="${mx}" y="${my+(p.v==='1µF'?18:21)}" class="pl small">${p.v}</text><text x="${px}" y="${py-7}" class="pm">＋</text>`; break; }
+    case 'led':{ const [mx,my]=mid(p.plus,p.minus); const [px,py]=P(p.plus),[nx,ny]=P(p.minus);
+      s=legs(p.plus,p.minus)+`<circle cx="${mx}" cy="${my}" r="26" fill="url(#glow)" class="glow" opacity="0"/><circle cx="${mx}" cy="${my}" r="8" class="ledb"/><text x="${px+1}" y="${py-7}" class="pm">＋</text><text x="${nx-1}" y="${ny-7}" class="pm minus">−</text>`; break; }
+    case 'tr': case 'mel':{
+      const pts=p.pins.map(P); const x0=pts[0][0], y0=pts[0][1]; const dn=p.body!=='up'?1:-1;
+      const d=`M ${x0-13} ${y0+3*dn} H ${x0+65} V ${y0+12*dn} Q ${x0+65} ${y0+29*dn} ${x0+26} ${y0+29*dn} Q ${x0-13} ${y0+29*dn} ${x0-13} ${y0+12*dn} Z`;
+      s=pts.map(([x,y])=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+4*dn}" class="tleg"/><circle cx="${x}" cy="${y}" r="2.6" class="ft"/>`).join('')+`<path d="${d}" class="trb"/>`;
+      const ly=y0+16*dn; s+=`<rect x="${x0+6}" y="${ly-6}" width="40" height="12" rx="1.5" class="trl"/><text x="${x0+26}" y="${ly+3.5}" class="trt">${p.t==='mel'?'メロディ':p.name}</text>`; break; }
+    case 'vr':{
+      const pts=p.pins.map(P); const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
+      const x1=Math.min(...xs)-13, x2=Math.max(...xs)+13, y1=Math.min(...ys)-12, y2=Math.max(...ys)+12; const cx=(x1+x2)/2, cy=(y1+y2)/2;
+      const ny = p.notch==='down'? y2-9 : y1;
+      s=`<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" rx="3" class="vrb"/><rect x="${cx-14}" y="${ny}" width="28" height="9" class="notch"/>`+
+        `<circle cx="${cx}" cy="${cy}" r="${Math.min(x2-x1,y2-y1)/2-8}" class="vrk"/><line x1="${cx-12}" y1="${cy+12}" x2="${cx+12}" y2="${cy-12}" class="vra"/><path d="M${cx+12} ${cy-12} l-8 1 m8 -1 l-1 8" class="vra"/>`+
+        `<rect x="${cx-22}" y="${cy-7}" width="44" height="14" rx="2" class="vrl"/><text x="${cx}" y="${cy+4}" class="vrt">${p.v==='1M'?'1MΩ':'100kΩ'}</text>`+
+        pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" class="vrp"/>`).join(''); break; }
+    case 'sw':{
+      const pts=p.pins.map(P); const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
+      const x1=Math.min(...xs)-8,x2=Math.max(...xs)+8,y1=Math.min(...ys)-8,y2=Math.max(...ys)+8;
+      s=`<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" rx="3" class="swb"/>`+pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.5" class="swd"/>`).join('')+
+        `<circle cx="${(x1+x2)/2}" cy="${(y1+y2)/2}" r="15" class="swc" id="swcap"/>`; break; }
+    case 'pir':{
+      const a=P(p.vp),b=P(p.vo),c=P(p.vm); const cx=(a[0]+c[0])/2, cy=(a[1]+b[1])/2;
+      s=`<circle cx="${cx}" cy="${cy}" r="40" class="pirring"/><circle cx="${cx}" cy="${cy}" r="35" fill="url(#dome)"/>`+
+        [a,b,c].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" class="dot"/>`).join('')+`<text x="${cx}" y="${cy-18}" class="pirt">人感</text>`; break; }
+    case 'mic':{
+      const a=P(p.plus),b=P(p.minus); const cx=(a[0]+b[0])/2, cy=a[1]+ (a[1]>200?-4:4);
+      s=`<circle cx="${cx}" cy="${cy}" r="22" class="micring"/><circle cx="${cx}" cy="${cy}" r="17" fill="url(#mesh)" class="micin"/>`+[a,b].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" class="dot"/>`).join('')+
+        `<text x="${a[0]+3}" y="${a[1]-8}" class="pm">＋</text>`; break; }
+    case 'ir':{
+      const pts=[P(p.vp),P(p.vm),P(p.vo)]; const x0=pts[0][0], y0=pts[0][1];
+      s=pts.map(([x,y])=>`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-9}" class="tleg"/><circle cx="${x}" cy="${y}" r="2.6" class="ft"/>`).join('')+
+        `<path d="M ${x0+12} ${y0-30} A 14 13 0 0 1 ${x0+40} ${y0-30} Z" class="irdome"/><rect x="${x0-13}" y="${y0-31}" width="78" height="22" class="irb"/><text x="${x0+26}" y="${y0-16}" class="irt">赤外線</text>`; break; }
+    case 'spk':{
+      const [ax,ay]=P(p.a),[bx,by]=P(p.b); const sx=692, sy=(ay+by)/2;
+      s=`<line x1="${ax}" y1="${ay}" x2="${sx-30}" y2="${sy-24}" class="spkw red"/><line x1="${bx}" y1="${by}" x2="${sx-26}" y2="${sy+28}" class="spkw"/>`+
+        `<g class="spk" id="spk"><circle cx="${sx}" cy="${sy}" r="42" class="spk0"/><circle cx="${sx}" cy="${sy}" r="30" class="spk1"/><circle cx="${sx}" cy="${sy}" r="18" class="spk0"/><circle cx="${sx}" cy="${sy}" r="6" class="spk2"/></g>`; break; }
+  }
+  return s;
+}
+
+function drawBoard(parts, opts){
+  opts=opts||{};
+  let s=`<defs>
+  <radialGradient id="glow"><stop offset="0" stop-color="#FFF27A" stop-opacity="1"/><stop offset=".4" stop-color="#FFD21F" stop-opacity=".6"/><stop offset="1" stop-color="#FFD21F" stop-opacity="0"/></radialGradient>
+  <radialGradient id="dome" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#C9CCD1"/><stop offset="1" stop-color="#6E737B"/></radialGradient>
+  <pattern id="mesh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><path d="M0 0H6M0 0V6" stroke="#444" stroke-width="1"/></pattern>
+  </defs>`;
+  s+=`<rect x="2" y="2" width="644" height="414" rx="10" class="pcb"/><rect x="34" y="196" width="580" height="22" rx="2" class="chan"/>`;
+  s+=`<text x="16" y="${YR[0]+5}" class="rail p">＋</text><text x="16" y="${YR[11]+5}" class="rail m">−</text>`;
+  [...ROWS].forEach((r,i)=>s+=`<text x="${XC(24)+2}" y="${YR[i]+4.5}" class="rowl">${r}</text>`);
+  for(const c of [5,10,15,20]){ s+=`<text x="${XC(c)}" y="20" class="coll">${c}</text><text x="${XC(c)}" y="403" class="coll">${c}</text>`; }
+  for(let r=0;r<12;r++) for(let c=2;c<=23;c++) s+=`<rect x="${XC(c)-3.3}" y="${YR[r]-3.3}" width="6.6" height="6.6" class="hole"/>`;
+  s+=`<rect x="2" y="2" width="644" height="414" rx="10" class="night" id="night" opacity="0"/>`;
+  parts.forEach((p,i)=>{
+    let cls='part';
+    if(opts.step!=null){ if(i>opts.step) return; cls+= i===opts.step?' now':' done'; }
+    if(opts.focus===i) cls+=' focus';
+    if(opts.hilite && opts.hilite.includes(i)) cls+=' focus';
+    s+=`<g class="${cls}" data-i="${i}">${partSVG(p,i)}</g>`;
+  });
+  if(opts.step!=null){ const p=parts[opts.step]; for(const h of holesOf(p)){ const [x,y]=P(h); s+=`<circle cx="${x}" cy="${y}" r="9" class="ring"/>`; } }
+  if(opts.focus!=null && opts.focus>=0){ for(const h of holesOf(parts[opts.focus])){ const [x,y]=P(h); s+=`<circle cx="${x}" cy="${y}" r="8" class="ring"/>`; } }
+  if(opts.hilite) for(const i of opts.hilite){ for(const h of holesOf(parts[i])){ const [x,y]=P(h); s+=`<circle cx="${x}" cy="${y}" r="8" class="ring"/>`; } }
+  return s;
+}
+function holesOf(p){
+  switch(p.t){ case 'wire': case 'res': case 'cds': case 'spk': return [p.a,p.b]; case 'cap': case 'led': return [p.plus,p.minus];
+    case 'tr': case 'mel': case 'vr': case 'sw': return p.pins; case 'pir': return [p.vp,p.vo,p.vm]; case 'mic': return [p.plus,p.minus]; case 'ir': return [p.vp,p.vm,p.vo]; }
+  return [];
+}
+
+// ---- 部品の名前と差し方 ----
+function info(p){
+  const r=RES[p.v];
+  const RROLE={'10k':'トランジスタに流す電気の量を決める抵抗です。','22k':'次のトランジスタのスイッチを入れる電気を調整する抵抗です。','4.7k':'電気の量を決める抵抗です。','1k':'電気の量を決める抵抗です。','68k':'電気の量を決める抵抗です。','200k':'電気の量を決める抵抗です。','150':'メロディICに流す電気の量を決める抵抗です。'};
+  switch(p.t){
+    case 'wire': return {cat:0,name:'ジャンパー線',how:`${HN(p.a)} と ${HN(p.b)} をつなぐ`,role:'部品と部品をつなぐ線です。両はしだけがつながります。'};
+    case 'res': return {cat:1,name:`抵抗 ${r.lab}（${r.t}）`,how:`${HN(p.a)} と ${HN(p.b)} に差す`,role:RROLE[p.v]||'電気の量を決める抵抗です。',bands:r.t};
+    case 'cds': return {cat:2,name:'CdS（光センサー）',how:`${HN(p.a)} と ${HN(p.b)} に差す`,role:'まわりの明るさを感じるセンサーです。明るいほど電気を通しやすくなります。'};
+    case 'pir': return {cat:2,name:'人感センサー',how:`V+ を ${HN(p.vp)}、Vo を ${HN(p.vo)}、V− を ${HN(p.vm)} に差す`,role:'人の動きを感じるセンサーです。人がいると Vo から電気を送り出します。',warn:'3本の足に V+・Vo・V− の役わりがあります。向きをまちがえると動きません。'};
+    case 'mic': return {cat:2,name:'マイク',how:`＋ を ${HN(p.plus)}、− を ${HN(p.minus)} に差す`,role:'音を電気の信号に変えるセンサーです。',warn:'＋と−の向きがあります。'};
+    case 'ir': return {cat:2,name:'赤外線受光センサー',how:`V+ を ${HN(p.vp)}、V− を ${HN(p.vm)}、Vo を ${HN(p.vo)} に差す`,role:'リモコンなどの赤外線を受けると反応するセンサーです。',warn:'3本の足に役わりがあります。向きに注意。'};
+    case 'tr': { const nm=p.name==='1015'?'A1015':'C1815';
+      return {cat:3,name:`トランジスタ ${nm}`,how:`${p.pins.map(HN).join('・')} に差す（丸い側の向きを図と同じに）`,
+        role:'小さな電気で、大きな電気を流したり止めたりするスイッチのはたらきをします。',warn:'平らな面・丸い面の向きと、3本の足（E・C・B）の並びに注意。逆向きだと正しく動きません。'}; }
+    case 'mel': return {cat:3,name:'メロディIC',how:`${p.pins.map(HN).join('・')} に差す（丸い側の向きを図と同じに）`,role:'電気が流れるとメロディを鳴らす部品です。',warn:'向きがあります。丸い面を図と同じ向きに。'};
+    case 'cap': return {cat:4,name:`コンデンサ ${p.v}`,how:`＋（長い足）を ${HN(p.plus)}、− を ${HN(p.minus)} に差す`,role:'電気を一時的にためて、少しずつ流す部品です。これが「ゆっくり消える（または鳴りやむ）」時間をつくります。',warn:'＋（長い足）と−（短い足）の向きがあります。逆に差すとこわれることがあります。'};
+    case 'sw': return {cat:4,name:'押しボタンスイッチ',how:`${p.pins.map(HN).join('・')} に差す`,role:'押すと、コンデンサにたまった電気を逃がして、すぐにリセットするボタンです。'};
+    case 'vr': return p.v==='1M'
+      ? {cat:4,name:'半固定抵抗 1MΩ',how:`${p.pins.map(HN).join('・')} に差す`,role:'つまみを回すと、ゆっくり消える（鳴りやむ）までの時間を変えられます。'}
+      : {cat:4,name:'半固定抵抗 100kΩ',how:`${p.pins.map(HN).join('・')} に差す`,role:'つまみを回すと、どれくらいの明るさで反応するか（感度）を変えられます。'};
+    case 'led': return {cat:5,name:'LED',how:`＋（長い足）を ${HN(p.plus)}、− を ${HN(p.minus)} に差す`,role:'電気が流れると光る部品です。',warn:'＋（長い足）と−（短い足）の向きがあります。逆だと光りません。'};
+    case 'spk': return {cat:6,name:'スピーカー',how:`線を ${HN(p.a)} と ${HN(p.b)} につなぐ`,role:'メロディICの信号を音にして鳴らす部品です。'};
+  }
+}
+function ordered(parts){ return parts.map((p,i)=>({p,i,f:info(p)})).sort((a,b)=>a.f.cat-b.f.cat||a.i-b.i).map(x=>x.p); }
+
+// ---- 画面更新 ----
+const WARN_ORDER=['LED','コンデンサ','トランジスタ','メロディIC','人感センサー','マイク','赤外線受光センサー'];
+const warnKey=name=>{ for(const k of WARN_ORDER) if(name.indexOf(k)>=0) return WARN_ORDER.indexOf(k); return 99; };
+function renderCaution(){
+  const box=$('#caution'); if(!current){ box.hidden=true; return; }
+  const seen=new Map();
+  for(const p of current.parts){ const f=info(p); if(!f.warn) continue; if(!seen.has(f.name)) seen.set(f.name,f); }
+  const list=[...seen.values()].sort((a,b)=>warnKey(a.name)-warnKey(b.name));
+  if(!list.length){ box.hidden=true; return; }
+  box.hidden=false;
+  $('#cautionList').innerHTML=list.map(f=>`<li data-name="${f.name}" tabindex="0" role="button"><b>${f.name}</b><span>${f.warn}</span></li>`).join('');
+}
+function render(){
+  document.querySelectorAll('[data-top]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.top===topMode));
+  $('#naviPick').hidden = topMode!=='navi';
+  $('#basicsBar').hidden = topMode!=='basics';
+  $('#bExplain').hidden = topMode!=='basics';
+  $('#learnSec').hidden = topMode!=='learn';
+  $('#quizSec').hidden = topMode!=='quiz';
+  const other = topMode==='learn' || topMode==='quiz';
+  $('#result').hidden = other; $('.foot').hidden = other;
+  if(topMode!=='learn') $('#lBody').innerHTML='';
+  if(other){ current=null; stopAudio(); if(topMode==='learn') renderLearn(); else renderQuiz(); return; }
+  if(topMode==='basics'){ renderBasics(); return; }
+  for(const k of ['light','person','sound','ir']){ const el=document.querySelector(`[data-sensor=${k}]`); el.setAttribute('aria-pressed',sel[k]); }
+  document.querySelectorAll('[data-lm]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.lm===sel.lightMode));
+  document.querySelectorAll('[data-out]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.out===sel.out));
+  document.querySelectorAll('[data-delay]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.delay===sel.delay));
+  const ob=document.querySelector('[data-delay=on]'); ob.classList.toggle('dim', momentary()); ob.querySelector('.sb').textContent = momentary()?'音・赤外線では選べません':'ゆっくり動きだし、ゆっくり止まる';
+  const r=resolve();
+  const res=$('#result');
+  if(r.none){ res.classList.add('empty'); $('#emptyMsg').textContent=r.none; current=null; stopAudio(); return; }
+  res.classList.remove('empty');
+  const id=r.id, base=BASES[id];
+  if(!current || current.id!==id || current.out!==sel.out) st.level=0;
+  const kd=kindOf(id,sel.out); const derived=kd!=='print';
+  const parts=ordered(buildCircuit(id,sel.out));
+  current={id,base,parts,derived,out:sel.out};
+  $('#title').textContent = DESC[id][sel.out][0];
+  renderMemo(base,kd);
+  renderPlist(parts);
+  if(step>=parts.length) step=0;
+  hilite=[]; drawView(); buildTry();
+}
+function renderMemo(base,kd){
+  const shift = base.stage==='B'&&sel.out==='mel' ? '線が部品の上を通らないように、出力のトランジスタ2個と22kΩを1列左にずらしています。' : '';
+  $('#memoText').textContent = kd==='print' ? `${base.src}の配置図そのままです。`
+    : kd==='swap' ? `${base.src}をもとに、LEDとメロディの部分を入れかえています。${shift}`
+    : `${base.src}をもとに設計した回路です。${base.change||''}${base.native!==sel.out?'あわせて、LEDとメロディの部分を入れかえています。':''}${shift}キットの部品だけを使い、電流が流れすぎないことを計算で確かめていますが、授業の前に実物で動作を確かめてください。`;
+  $('.memo').hidden=false;
+}
+function renderPlist(parts){
+  const cnt=new Map(); for(const p of parts){ const n=info(p).name; cnt.set(n,(cnt.get(n)||0)+1); }
+  $('#plist').innerHTML=[...cnt].map(([n,c])=>`<li><span>${n}</span><b>${c}</b></li>`).join('');
+}
+function renderBasics(){
+  const s=BASICS[bStep];
+  const parts=ordered(s.parts);
+  current={id:'basic'+s.n, base:s, parts, derived:false, out:s.out};
+  $('#bNo').textContent=`ステップ ${s.n} / 11`;
+  $('#bTitle').textContent=s.title;
+  $('#bGoal').textContent=s.goal;
+  $('#bLearn').textContent=s.learn;
+  $('#bPrev').disabled=bStep===0;
+  $('#bNext').textContent = bStep===BASICS.length-1 ? '回路ナビへ ▶' : '次のステップ ▶';
+  $('#bDots').innerHTML=BASICS.map((x,i)=>`<button class="bdot${i===bStep?' on':''}${i<bStep?' done':''}" data-bi="${i}" aria-label="ステップ${x.n}">${x.n}</button>`).join('');
+  $('#title').textContent=s.title;
+  $('.memo').hidden=true;
+  renderPlist(parts);
+  if(step>=parts.length) step=0;
+  if(st.bstep!==s.n){ st.level=0; st.bstep=s.n; }
+  renderExplain(s);
+  hilite=[]; drawView(); buildTry();
+}
+function drawView(){
+  if(!current) return;
+  document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===view));
+  $('#stepPane').hidden=view!=='steps'; $('#tryPane').hidden=view!=='try'; $('#fullPane').hidden=view!=='full';
+  const svg=$('#board');
+  const spk=current.parts.some(p=>p.t==='spk');
+  svg.setAttribute('viewBox', spk?'0 0 748 418':'0 0 648 418');
+  if(view==='steps'){
+    svg.innerHTML=drawBoard(current.parts,{step});
+    const p=current.parts[step], f=info(p);
+    $('#stepNo').textContent=`${step+1} / ${current.parts.length}`;
+    $('#stepName').textContent=f.name; $('#stepHow').textContent=f.how;
+    $('#prevBtn').disabled=step===0; $('#nextBtn').textContent= step===current.parts.length-1?'完成！':'次へ';
+    $('#stepBar').style.width=((step+1)/current.parts.length*100)+'%';
+  } else {
+    svg.innerHTML=drawBoard(current.parts,{focus:view==='full'?focusIdx:-1, hilite:hilite});
+    if(view==='full'){ const f= focusIdx>=0 ? info(current.parts[focusIdx]) : null;
+      $('#focusInfo').innerHTML = f
+        ? `<p class="fi-name">${f.name}</p>${f.role?`<p class="fi-role">${f.role}</p>`:''}<p class="fi-how">さしこむ場所：${f.how}</p>${f.warn?`<p class="fi-warn">⚠ ${f.warn}</p>`:''}`
+        : 'ボードの部品をタップすると、そのはたらきと、さしこむ場所がわかります。'; }
+  }
+  svg.classList.toggle('tryMode',view==='try');
+  renderCaution();
+  $('#result').classList.toggle('pinboard', view!=='full'); $('#result').classList.toggle('trying', view==='try');
+  requestAnimationFrame(afterDraw);
+}
+function afterDraw(){
+  const wrap=$('.boardwrap'); const scrollable = wrap.scrollWidth > wrap.clientWidth+4;
+  $('#scrollHint').hidden=!scrollable;
+  if(!scrollable) return;
+  const el = view==='steps' ? $('#board .part.now') : (view==='full' && focusIdx>=0 ? $('#board .part.focus') : null);
+  if(el){ const r=el.getBoundingClientRect(), w=wrap.getBoundingClientRect();
+    const target=wrap.scrollLeft + (r.left+r.width/2) - (w.left+w.width/2);
+    wrap.scrollTo({left:Math.max(0,target), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
+}
+addEventListener('resize',()=>{ if(current) afterDraw(); });
+
+// ---- ためしてみる ----
+const st={dark:false,person:false,soundT:0,irT:0,reset:false,level:0,muted:false};
+const IC={
+  sun:'<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></g></svg>',
+  person:'<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="6" r="3.4" fill="currentColor"/><path d="M6 22v-6a6 6 0 0 1 12 0v6z" fill="currentColor"/></svg>',
+  sound:'<svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  ir:'<svg viewBox="0 0 24 24" class="ic"><rect x="7" y="8" width="9" height="14" rx="2" fill="currentColor"/><path d="M9 5a5 5 0 0 1 5 0M7.5 2.5a8 8 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+};
+function buildTry(){
+  if(!current) return;
+  const s=current.base.sensors||{}; let h='';
+  st.noLight=!!current.base.noLight;
+  if(st.noLight){
+    $('#tryBtns').innerHTML='<p class="alwaysmsg">電源を入れても、LEDは光りません。<br>1本道（直列）に2個つなぐと、1個あたりの電圧が足りなくなるからです。<br>➡ 次のステップの「並列」で、2個とも光らせよう。</p>';
+    $('#muteRow').hidden=true; $('#tryHint').textContent='このつなぎ方だと……？'; st.always=false; return;
+  }
+  if(current.base.always && !s.light && !s.person && !s.sound && !s.ir){
+    $('#tryBtns').innerHTML='<p class=\"alwaysmsg\">電源が入っていれば'+(current.out==='led'?'LEDが光ります':'メロディが鳴ります')+'。右下のリセットは使いません。</p>';
+    $('#muteRow').hidden=current.out!=='mel';
+    $('#tryHint').textContent = current.out==='led'?'完成したら光るはずです。':'完成したら鳴るはずです。';
+    st.always=true; return;
+  }
+  st.always=false;
+  if(s.light) h+=`<div class="trow"><p class="tl">${IC.sun}まわりの明るさ</p><div class="seg2" role="group" aria-label="まわりの明るさ">
+      <button class="bright" data-set="dark" data-v="0" aria-pressed="${!st.dark}">明るい</button><button class="dark" data-set="dark" data-v="1" aria-pressed="${st.dark}">暗い</button></div></div>`;
+  if(s.person) h+=`<div class="trow"><p class="tl">${IC.person}人感センサーの前に</p><div class="seg2" role="group" aria-label="人感センサーの前">
+      <button data-set="person" data-v="0" aria-pressed="${!st.person}">だれもいない</button><button class="yes" data-set="person" data-v="1" aria-pressed="${st.person}">人がいる</button></div></div>`;
+  if(s.sound) h+=`<div class="trow"><p class="tl">${IC.sound}マイクの近くで</p><button class="tbtn" id="tSound">手をパン！とたたく</button></div>`;
+  if(s.ir) h+=`<div class="trow"><p class="tl">${IC.ir}赤外線センサーに向けて</p><button class="tbtn" id="tIr">リモコンのボタンを押す</button></div>`;
+  h+=`<div class="trow"><button class="tbtn reset" id="tReset">リセットボタン（押している間）</button></div>`;
+  $('#tryBtns').innerHTML=h;
+  document.querySelectorAll('#tryBtns [data-set]').forEach(b=>b.onclick=()=>{ st[b.dataset.set]= b.dataset.v==='1'; wake();
+    b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b)); });
+  const mom=(id,key,len)=>{ const b=$(id); if(b) b.onclick=()=>{ st[key]=performance.now()+len; b.classList.add('flash'); setTimeout(()=>b.classList.remove('flash'),300); wake(); }; };
+  mom('#tSound','soundT',350); mom('#tIr','irT',600);
+  const rb=$('#tReset'); const set=v=>{ st.reset=v; rb.classList.toggle('held',v); };
+  rb.onpointerdown=e=>{ rb.setPointerCapture(e.pointerId); set(true); wake(); };
+  rb.onpointerup=rb.onpointercancel=rb.onlostpointercapture=()=>set(false);
+  rb.onkeydown=e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); set(true);} }; rb.onkeyup=()=>set(false);
+  $('#muteRow').hidden=current.out!=='mel';
+  $('#tryHint').textContent = `まわりのようすを変えて、${current.out==='led'?'LEDがどう光るか':'メロディがどう鳴るか'}ためしてみよう。`;
+}
+function condition(now){
+  if(current.base.always) return true;
+  const s=current.base.sensors||{}; let ok=true;
+  if(s.light) ok = ok && (s.light==='dark'? st.dark : !st.dark);
+  if(s.person) ok = ok && st.person;
+  if(s.sound) ok = ok && now<st.soundT;
+  if(s.ir) ok = ok && now<st.irT;
+  return ok;
+}
+let last=performance.now();
+function tick(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(current && view==='try'){
+    const c=condition(now);
+    if(st.noLight){ st.level=0; }
+    else if(st.always){ st.level=1; }
+    else if(st.reset) st.level=0;
+    else if(c){ const tau=(current.base.delay==='on'||current.base.slowRise)?2.6:.12; st.level+= (1-st.level)*(1-Math.exp(-dt/tau)); }
+    else { st.level*= Math.exp(-dt/((current.base.delay==='on'||current.base.slowRise)?3.6:3.2)); }
+    const out=Math.max(0,Math.min(1,(st.level-.25)/.6));
+    document.querySelectorAll('#board .glow').forEach(g=>g.setAttribute('opacity',out.toFixed(3)));
+    document.querySelectorAll('#board .ledb').forEach(g=>g.style.fill= out>.03?`rgb(255,${Math.round(225+30*out)},${Math.round(80+160*out)})`:'');
+    const n=$('#night'); if(n) n.setAttribute('opacity', (current.base.sensors||{}).light && st.dark ? .38 : 0);
+    const spk=$('#spk'); if(spk) spk.style.transform = out>.02 ? `scale(${1+0.04*out*Math.sin(now/45)})` : '';
+    const sw=$('#swcap'); if(sw) sw.classList.toggle('held',st.reset);
+    $('#meter').style.width=(out*100).toFixed(1)+'%';
+    $('#meterLab').textContent = out>.02 ? (current.out==='led'?`LEDの明るさ ${Math.round(out*100)}%`:`メロディの音量 ${Math.round(out*100)}%`) : (current.out==='led'?'LEDは消えています':'メロディは止まっています');
+    if(current.out==='mel') audioLevel(st.muted?0:out); else audioLevel(0);
+    if(current.out==='mel' && out>.05 && Math.random()<dt*4*out) spawnNote();
+  } else audioLevel(0);
+  requestAnimationFrame(tick);
+}
+function spawnNote(){
+  const wrap=$('#notes'); const el=document.createElement('span'); el.className='note'; el.textContent=Math.random()<.5?'♪':'♫';
+  el.style.right=(2+Math.random()*10)+'%'; el.style.top=(42+Math.random()*25)+'%'; wrap.appendChild(el); setTimeout(()=>el.remove(),1600);
+}
+// 音（メロディICふうの音）
+let ac=null, gain=null, seqTimer=null;
+const TUNE=[659,784,880,784,659,587,523,587,659,659,587,587,523,0,523,0];
+function wake(){ if(current && current.out==='mel' && !ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); gain=ac.createGain(); gain.gain.value=0; gain.connect(ac.destination);
+  const osc=ac.createOscillator(); osc.type='square'; osc.connect(gain); osc.start(); let k=0;
+  seqTimer=setInterval(()=>{ const f=TUNE[k++%TUNE.length]; if(f) osc.frequency.setTargetAtTime(f,ac.currentTime,.005); gain.gain.setTargetAtTime(f?curVol:0,ac.currentTime,.01); },190);
+ }catch(e){ ac=null; } } if(ac && ac.state==='suspended') ac.resume(); }
+let curVol=0;
+function audioLevel(v){ curVol=0.05*v; if(gain&&ac) gain.gain.setTargetAtTime(curVol,ac.currentTime,.05); }
+function stopAudio(){ audioLevel(0); }
+
+// ===== 図（解説・しくみを知る・確認テストで使う） =====
+// 電子用図記号は JIS C 0617 の形にそろえています。どの記号も横向きで、左はし(0,0)・右はし(60,0)が端子です。
+const r1=v=>Math.round(v*10)/10;
+function fHead(x1,y1,x2,y2,s,cls){ s=s||7; const a=Math.atan2(y2-y1,x2-x1),c=Math.cos(a),n=Math.sin(a),bx=x2-s*c,by=y2-s*n,px=-n*s*.45,py=c*s*.45;
+  return `<path class="${cls||'fg-k'}" d="M${r1(x2)} ${r1(y2)}L${r1(bx+px)} ${r1(by+py)}L${r1(bx-px)} ${r1(by-py)}Z"/>`; }
+function fArw(x1,y1,x2,y2,cls,hcls,s){ s=s||7; const a=Math.atan2(y2-y1,x2-x1);
+  return `<path class="${cls||'fg-l'}" d="M${x1} ${y1}L${r1(x2-s*.7*Math.cos(a))} ${r1(y2-s*.7*Math.sin(a))}"/>`+fHead(x1,y1,x2,y2,s,hcls); }
+const fCur=(x1,y1,x2,y2)=>fArw(x1,y1,x2,y2,'fg-cur','fg-curh',8);
+function fTx(x,y,s,r,cls,anc){ return `<text x="${x}" y="${y}" class="${cls||'fg-t'}" text-anchor="${anc||'middle'}" dominant-baseline="central"${r?` transform="rotate(${-r} ${x} ${y})"`:''}>${s}</text>`; }
+const fL=(x,y,s,anc,cls)=>fTx(x,y,s,0,cls,anc);
+const fW=pts=>`<polyline class="fg-l" points="${pts}"/>`;
+const fDot=(x,y)=>`<circle cx="${x}" cy="${y}" r="3.2" class="fg-k"/>`;
+const fSvg=(vb,body,lab)=>`<svg class="fig" viewBox="${vb}" role="img" aria-label="${lab||''}">${body}</svg>`;
+const SYM={
+  bat:r=>`<path class="fg-l" d="M0 0H26M34 0H60M26 -15V15"/><path d="M34 -8V8" stroke="#1B2335" stroke-width="5"/>`+fTx(16,-13,'+',r,'fg-t fg-red'),
+  res:()=>`<path class="fg-l" d="M0 0H14M46 0H60"/><rect class="fg-b" x="14" y="-7" width="32" height="14"/>`,
+  vr:()=>SYM.res()+fArw(16,12,46,-15,'fg-l','fg-k',7),
+  semi:()=>SYM.res()+`<path class="fg-l" d="M18 11L40 -11M36 -15L44 -7"/>`,
+  diode:()=>`<path class="fg-l" d="M0 0H20M40 0H60M40 -11V11"/><path class="fg-b" d="M20 -11V11L40 0Z"/>`,
+  led:()=>SYM.diode()+fArw(27,-14,35,-24,'fg-l','fg-k',5)+fArw(34,-12,42,-22,'fg-l','fg-k',5),
+  cds:()=>SYM.res()+fArw(3,-27,15,-12,'fg-l','fg-k',6)+fArw(15,-29,27,-13,'fg-l','fg-k',6),
+  cap:r=>`<path class="fg-l" d="M0 0H26M34 0H60M26 -13V13M34 -13V13"/>`+fTx(17,-15,'+',r,'fg-t fg-red'),
+  sw:()=>`<path class="fg-l" d="M0 0H16M44 0H60M14 -9H46M30 -9V-19M24 -19H36"/><circle class="fg-b" cx="18.5" cy="0" r="2.5"/><circle class="fg-b" cx="41.5" cy="0" r="2.5"/>`,
+  lamp:()=>`<path class="fg-l" d="M0 0H18M42 0H60"/><circle class="fg-b" cx="30" cy="0" r="12"/><path class="fg-l" d="M21.5 -8.5L38.5 8.5M38.5 -8.5L21.5 8.5"/>`,
+  mic:()=>`<path class="fg-l" d="M0 0H18M42 0H60"/><circle class="fg-b" cx="30" cy="0" r="12"/><path class="fg-l" d="M18 -12V12"/>`,
+  spk:()=>`<path class="fg-l" d="M0 -5H22M0 5H22"/><rect class="fg-b" x="22" y="-9" width="9" height="18"/><path class="fg-b" d="M31 -9L44 -20V20L31 9Z"/>`,
+  npn:()=>`<circle class="fg-b" cx="26" cy="0" r="21"/><path class="fg-l" d="M0 0H17M17 -12V12M17 -5L34 -17V-30M17 5L34 17V30"/>`+fHead(17,5,30,14.2,7),
+  pnp:()=>`<circle class="fg-b" cx="26" cy="0" r="21"/><path class="fg-l" d="M0 0H17M17 -12V12M17 -5L34 -17V-30M17 5L34 17V30"/>`+fHead(34,17,21.5,8.2,7),
+  join:()=>`<path class="fg-l" d="M0 0H60M30 -22V22"/>`+fDot(30,0),
+  cross:()=>`<path class="fg-l" d="M0 0H60M30 -22V22"/>`
+};
+const fP=(k,x,y,r)=>`<g transform="translate(${x} ${y})${r?` rotate(${r})`:''}">${SYM[k](r||0)}</g>`;
+function symSVG(k){ const tr=k==='npn'||k==='pnp'; return `<svg viewBox="${tr?'-8 -36 66 72':'-8 -32 76 64'}" aria-hidden="true">${fP(k,0,0)}</svg>`; }
+
+const FIG={
+  // ── 部品のイラスト ──
+  pLED:()=>fSvg('0 0 300 170',
+    `<path d="M60 74V44A20 20 0 0 1 100 44V74Z" fill="#FFE066" stroke="#9C7F12" stroke-width="2"/><path d="M54 74H106V82H54Z" fill="#FFD21A" stroke="#9C7F12" stroke-width="2"/>`+
+    `<path d="M70 82V156" stroke="#E8402F" stroke-width="4" stroke-linecap="round"/><path d="M90 82V132" stroke="#2F6FE0" stroke-width="4" stroke-linecap="round"/>`+
+    fL(70,165,'＋','middle','fg-t fg-red')+fL(90,141,'−','middle','fg-t fg-blue')+
+    fL(124,40,'光る部分（中に半導体）','start','fg-ts')+fL(124,74,'長い足 ＝ ＋（アノード）','start','fg-t fg-red')+fL(124,94,'短い足 ＝ −（カソード）','start','fg-t fg-blue')+
+    fL(124,124,'記号','start','fg-ts')+fP('led',152,130)+fL(152,148,'＋','middle','fg-ts')+fL(212,148,'−','middle','fg-ts'),'LEDの足と記号'),
+  pRes:()=>{ const C=[['黒','#1f1f1f'],['茶','#8B4A1E'],['赤','#D9312B'],['橙','#F08A24'],['黄','#F5D000'],['緑','#1FA34A'],['青','#1E6FD9'],['紫','#8A3FD1'],['灰','#9A9A9A'],['白','#FFFFFF']];
+    let p=`<path d="M20 34H280" stroke="#8E95A3" stroke-width="3"/><rect x="95" y="20" width="110" height="28" rx="13" fill="#F6DDAE" stroke="#B8955A" stroke-width="2"/>`+
+      [[112,'#8B4A1E'],[130,'#1f1f1f'],[148,'#F08A24'],[183,'#C9A227']].map(([x,c])=>`<rect x="${x}" y="20" width="9" height="28" fill="${c}"/>`).join('')+
+      fL(116,62,'1')+fL(134,62,'0')+fL(156,62,'×1000','middle','fg-ts')+fL(188,62,'誤差','middle','fg-ts')+
+      fL(150,84,'茶・黒・橙 → 10 × 1000 ＝ 10000Ω ＝ 10kΩ');
+    C.forEach(([n,c],i)=>{ const x=17+i*27; p+=`<rect x="${x}" y="102" width="22" height="16" rx="3" fill="${c}" stroke="#9AA3B2"/>`+fL(x+11,130,String(i))+fL(x+11,146,n,'middle','fg-ts'); });
+    return fSvg('0 0 300 158',p,'抵抗器のカラーコード'); },
+  pVR:()=>fSvg('0 0 300 165',
+    `<rect x="40" y="18" width="80" height="80" rx="6" fill="#3D6FD6" stroke="#1F3F8F" stroke-width="2"/><circle cx="80" cy="58" r="27" fill="none" stroke="#fff" stroke-width="2"/><path d="M66 72L94 44" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`+
+    [55,80,105].map(x=>`<path d="M${x} 98V138" stroke="#8E95A3" stroke-width="4" stroke-linecap="round"/>`).join('')+
+    fL(52,152,'はし','middle','fg-ts')+fL(80,152,'真ん中','middle','fg-ts')+fL(108,152,'はし','middle','fg-ts')+
+    fL(140,34,'つまみを回すと……','start')+fL(140,56,'真ん中の足と、はしの足の','start','fg-ts')+fL(140,72,'あいだの抵抗が変わる','start','fg-ts')+
+    fL(140,110,'記号','start','fg-ts')+fP('semi',174,112),'半固定抵抗の足と記号'),
+  pTR:()=>fSvg('0 0 300 180',
+    `<path d="M40 92V46Q40 28 58 28H112Q130 28 130 46V92Z" fill="#1E1E1E"/><rect x="57" y="50" width="56" height="18" rx="3" fill="#fff"/>`+fL(85,59,'C1815')+
+    [63,85,107].map(x=>`<path d="M${x} 92V146" stroke="#8E95A3" stroke-width="4" stroke-linecap="round"/>`).join('')+
+    fL(63,160,'E')+fL(85,160,'C')+fL(107,160,'B')+
+    fL(150,24,'文字のある平らな面を手前、','start','fg-ts')+fL(150,39,'足を下にして左から E・C・B','start','fg-ts')+
+    fP('npn',166,112)+fL(208,86,'C（コレクタ）','start','fg-ts')+fL(208,140,'E（エミッタ）','start','fg-ts')+fL(166,170,'B（ベース）','middle','fg-ts')+fL(262,113,'NPN形','middle','fg-ts'),'トランジスタの足と記号'),
+  pCdS:()=>fSvg('0 0 300 160',
+    `<circle cx="70" cy="56" r="32" fill="#E2935F" stroke="#8A4D2A" stroke-width="2"/><path d="M52 41H86V49H54V57H86V65H54V73H84" fill="none" stroke="#FFF1DE" stroke-width="3"/>`+
+    `<path d="M58 88V146M82 88V146" stroke="#8E95A3" stroke-width="4" stroke-linecap="round"/>`+
+    `<path class="fg-l" d="M140 18V130H286"/>`+fL(146,14,'抵抗','start','fg-ts')+fL(286,144,'明るさ →','end','fg-ts')+
+    `<path d="M148 30Q170 110 280 122" fill="none" stroke="#E8402F" stroke-width="3"/>`+
+    fL(192,40,'暗い：抵抗が大きい','start','fg-ts')+fL(284,64,'明るい：抵抗が小さい','end','fg-ts')+fArw(262,72,270,110,'fg-l','fg-k',6),'CdSと明るさのグラフ'),
+  pPIR:()=>fSvg('0 0 300 160',
+    `<rect x="35" y="70" width="90" height="22" rx="3" fill="#2E7D4F" stroke="#1B5E3A" stroke-width="2"/><path d="M45 70A35 35 0 0 1 115 70Z" fill="#F2F3F5" stroke="#9AA0AA" stroke-width="2"/>`+
+    [60,80,100].map(x=>`<path d="M${x} 92V138" stroke="#8E95A3" stroke-width="4" stroke-linecap="round"/>`).join('')+
+    fL(60,151,'V+','middle','fg-ts')+fL(80,151,'Vo','middle','fg-ts')+fL(100,151,'V−','middle','fg-ts')+
+    fL(145,36,'V+ … 電源の＋','start','fg-ts')+fL(145,54,'Vo … 出力','start','fg-ts')+fL(145,72,'V− … 電源の−','start','fg-ts')+
+    fL(145,104,'人の体から出る赤外線の','start','fg-ts')+fL(145,120,'変化を感じとって、','start','fg-ts')+fL(145,136,'Vo から電気を出す','start','fg-ts'),'人感センサーの足'),
+  pMel:()=>fSvg('0 0 300 160',
+    `<path d="M40 82V48Q40 34 54 34H96Q110 34 110 48V82Z" fill="#1E1E1E"/>`+fL(75,58,'MELODY','middle','fg-ts fg-w')+
+    [55,75,95].map(x=>`<path d="M${x} 82V130" stroke="#8E95A3" stroke-width="4" stroke-linecap="round"/>`).join('')+fL(75,146,'メロディIC','middle','fg-ts')+
+    `<circle cx="210" cy="70" r="42" fill="#111"/><circle cx="210" cy="70" r="30" fill="#4B4F57"/><circle cx="210" cy="70" r="17" fill="#111"/><circle cx="210" cy="70" r="6" fill="#FFD400"/>`+
+    fL(210,130,'スピーカー','middle','fg-ts')+fL(210,146,'電気の信号 → 音','middle','fg-ts'),'メロディICとスピーカー'),
+  pCap:()=>fSvg('0 0 300 160',
+    `<rect x="50" y="18" width="56" height="82" rx="8" fill="#2F5BB8" stroke="#1B3A80" stroke-width="2"/><rect x="88" y="18" width="12" height="82" fill="#BFD0F2"/>`+
+    fL(94,40,'−')+fL(94,59,'−')+fL(94,78,'−')+
+    `<path d="M66 100V152" stroke="#E8402F" stroke-width="4" stroke-linecap="round"/><path d="M90 100V132" stroke="#2F6FE0" stroke-width="4" stroke-linecap="round"/>`+
+    fL(125,32,'電解コンデンサ 47µF','start')+fL(125,50,'µF（マイクロファラド）＝ためられる量','start','fg-ts')+
+    fL(125,82,'長い足 ＝ ＋','start','fg-t fg-red')+fL(125,100,'帯のある側・短い足 ＝ −','start','fg-t fg-blue')+
+    fL(125,132,'記号','start','fg-ts')+fP('cap',158,134),'コンデンサの足と記号'),
+
+  // ── 回路図 ──
+  loop1:()=>fSvg('-14 0 314 180', fP('bat',40,60,90)+fW('40,60 40,30 120,30')+fP('led',120,30)+fW('180,30 260,30 260,150 40,150 40,120')+
+    fL(20,90,'電池','end')+fL(150,52,'LED')+fCur(200,163,100,163)+fL(150,174,'電流の向き（＋ → −）','middle','fg-ts fg-red'),'電池とLEDの回路図'),
+  series:()=>fSvg('-14 0 314 180', fP('bat',40,60,90)+fW('40,60 40,30 80,30')+fP('led',80,30)+fW('140,30 160,30')+fP('led',160,30)+fW('220,30 260,30 260,150 40,150 40,120')+
+    fL(20,90,'電池','end')+fL(110,52,'LED①')+fL(190,52,'LED②')+fL(150,120,'道は1本だけ','middle','fg-ts')+fCur(200,163,100,163)+fL(150,174,'直列つなぎ','middle','fg-ts fg-red'),'直列の回路図'),
+  split:()=>fSvg('0 0 300 148',
+    fL(84,26,'電池の電圧','end')+`<rect x="92" y="14" width="180" height="24" rx="5" fill="#FFD21A"/>`+
+    fL(84,70,'直列で2個','end')+`<rect x="92" y="58" width="89" height="24" rx="5" fill="#FFF1B8" stroke="#C98A00"/><rect x="183" y="58" width="89" height="24" rx="5" fill="#FFF1B8" stroke="#C98A00"/>`+
+    fL(136,70,'LED①の分','middle','fg-ts')+fL(227,70,'LED②の分','middle','fg-ts')+
+    fL(84,114,'LED1個に必要','end')+`<rect x="92" y="102" width="122" height="24" rx="5" fill="#FFE9E6" stroke="#E8402F" stroke-width="2" stroke-dasharray="5 4"/>`+
+    `<path d="M181 90V134" stroke="#E8402F" stroke-width="2"/>`+fL(198,139,'足りない！','middle','fg-ts fg-red')+fL(248,114,'→ 光らない','middle','fg-t fg-red'),'直列で電圧を分け合うようす'),
+  par:n=>{ const xs=n===2?[140,230]:[110,165,220,275]; const L=xs[xs.length-1];
+    let b=fP('bat',40,70,90)+fW(`40,70 40,30 ${L},30`)+fW(`40,130 40,165 ${L},165`)+fL(20,100,'電池','end');
+    xs.forEach((x,i)=>{ b+=fW(`${x},30 ${x},65`)+fP('led',x,65,90)+fW(`${x},125 ${x},165`); if(i<xs.length-1) b+=fDot(x,30)+fDot(x,165); if(n===2) b+=fL(x,16,`道${'①②'[i]}`); });
+    if(n===2) b+=fCur(70,20,108,20);
+    return fSvg('-14 0 314 185',b+fL(165,178,'道が分かれている（並列つなぎ）','middle','fg-ts fg-red'),'並列の回路図'); },
+  resfig:k=>fSvg('-14 0 314 215', fP('bat',40,80,90)+fW('40,80 40,30 230,30')+fW('40,140 40,185 230,185')+fL(20,110,'電池','end')+
+    fW('130,30 130,40')+fP(k,130,40,90)+fW('130,100 130,110')+fP('led',130,110,90)+fW('130,170 130,185')+fDot(130,30)+fDot(130,185)+
+    fW('230,30 230,75')+fP('led',230,75,90)+fW('230,135 230,185')+
+    fL(150,70,k==='res'?'抵抗器':'半固定抵抗','start')+fL(158,140,'LED','start')+fL(256,105,'LED','start')+
+    fL(130,203,k==='res'?'抵抗あり（少し暗め）':'つまみで明るさが変わる','middle','fg-ts')+fL(238,203,'抵抗なし','middle','fg-ts'),'抵抗器を入れた回路図'),
+  dark:vr=>fSvg('-14 0 314 235', fP('bat',40,90,90)+fW('40,90 40,25 194,25')+fW('40,150 40,212 194,212')+fL(20,120,'電池','end')+
+    fW('100,25 100,35')+fP(vr?'semi':'res',100,35,90)+fW('100,95 100,125')+fDot(100,115)+fP('cds',100,125,90)+fW('100,185 100,212')+fDot(100,25)+fDot(100,212)+
+    fW('100,115 160,115')+fP('npn',160,115)+fP('led',194,25,90)+fW('194,145 194,212')+
+    (vr?fL(84,58,'半固定','end','fg-ts')+fL(84,72,'100kΩ','end'):fL(84,65,'68kΩ','end'))+fL(80,155,'CdS','end')+
+    fL(226,55,'LED','start')+fL(222,115,'C1815','start')+fL(150,104,'B','middle','fg-ts')+fL(201,95,'C','start','fg-ts')+fL(201,137,'E','start','fg-ts'),
+    vr?'感度を調整できる暗くなるとつく回路の回路図':'暗くなるとLEDがつく回路の回路図'),
+  pir:()=>fSvg('-14 0 314 210', fP('bat',40,75,90)+fW('40,75 40,25 90,25')+fW('40,135 40,190 240,190')+fL(20,105,'電池','end')+
+    `<rect x="70" y="70" width="70" height="70" rx="10" fill="#EEF1F6" stroke="#1B2335" stroke-width="2"/>`+fL(105,97,'人感')+fL(105,113,'センサー')+
+    fW('90,25 90,70')+fW('90,140 90,190')+fDot(90,190)+fL(96,58,'V+','start','fg-ts')+fL(96,152,'V−','start','fg-ts')+fL(144,96,'Vo','start','fg-ts')+
+    fW('140,105 155,105')+fP('res',155,105)+fW('215,105 240,105 240,110')+fP('led',240,110,90)+fW('240,170 240,190')+
+    fL(185,88,'10kΩ')+fL(262,140,'LED','start'),'人感センサーでLEDをつける回路図'),
+  mel:()=>fSvg('-14 0 334 245', fP('bat',40,100,90)+fW('40,100 40,25 230,25')+fW('40,160 40,222 285,222')+fL(20,130,'電池','end')+
+    fP('res',72,25,90)+fW('72,85 72,110 86,110')+fDot(72,25)+
+    fP('npn',86,110)+fW('120,80 120,25')+fDot(120,25)+
+    fW('120,140 120,165 136,165')+fP('npn',136,165)+fW('170,195 170,222')+fDot(170,222)+
+    fW('170,135 170,125 200,125')+
+    `<rect x="200" y="105" width="60" height="45" rx="6" fill="#F0E9FF" stroke="#1B2335" stroke-width="2"/>`+fL(230,121,'メロディ','middle','fg-ts')+fL(230,135,'IC','middle','fg-ts')+
+    fP('res',230,25,90)+fW('230,85 230,105')+
+    fW('260,130 285,130 285,148')+`<rect class="fg-b" x="279" y="148" width="12" height="12"/><path class="fg-b" d="M279 160L271 174H299L291 160Z"/>`+fW('285,174 285,222')+
+    `<rect x="78" y="70" width="114" height="140" rx="10" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-dasharray="5 4"/>`+fL(106,197,'スイッチ','middle','fg-ts fg-violet')+
+    fL(58,55,'200kΩ','end')+fL(246,55,'150Ω','start')+fL(285,236,'スピーカー','middle','fg-ts'),'メロディを鳴らす回路図'),
+  dOn:()=>FIG.delay('on'), dOff:()=>FIG.delay('off'),
+  delay:k=>{ const t1=86,t2=190,y0=132,yh=78;
+    let p=`<path class="fg-l" d="M44 10V140H290"/>`+fL(36,26,'センサー','end','fg-ts')+fL(36,96,k==='on'?'メロディ':'LED','end','fg-ts');
+    p+=`<path d="M48 36H${t1}V16H${t2}V36H286" fill="none" stroke="#2F6FE0" stroke-width="2.5"/>`;
+    let d=`M48 ${y0}H${t1}`; const tau=k==='on'?32:6;
+    for(let x=t1;x<=t2;x+=4){ const v=1-Math.exp(-(x-t1)/tau); d+=`L${x} ${r1(y0-yh*v)}`; }
+    const vE=1-Math.exp(-(t2-t1)/tau);
+    for(let x=t2;x<=286;x+=4){ const v=vE*Math.exp(-(x-t2)/30); d+=`L${x} ${r1(y0-yh*v)}`; }
+    p+=`<path d="${d}" fill="none" stroke="#E8402F" stroke-width="3" stroke-linejoin="round"/><path d="M${t1} 12V140M${t2} 12V140" stroke="#5B6579" stroke-dasharray="3 3"/>`;
+    p+=fL(t1,152,'人が来た','middle','fg-ts')+fL(t2,152,'いなくなった','middle','fg-ts')+fL(290,152,'時間 →','end','fg-ts');
+    p+= k==='on' ? fL(152,108,'じわっと','middle','fg-ts fg-red')+fL(152,120,'鳴りはじめる','middle','fg-ts fg-red') : fL(140,46,'すぐつく','middle','fg-ts fg-red');
+    p+=fL(250,68,'じわっと','middle','fg-ts fg-red')+fL(250,80,k==='on'?'消音':'消える','middle','fg-ts fg-red');
+    return fSvg('0 0 300 162',p,k==='on'?'オンディレイのグラフ':'オフディレイのグラフ'); },
+
+  // ── しくみを知る用 ──
+  water:()=>fSvg('0 0 300 165',
+    `<rect x="22" y="50" width="56" height="80" fill="#9CC9F5"/><rect x="222" y="122" width="56" height="26" fill="#9CC9F5"/>`+
+    `<path d="M80 112H128V118H172V112H220V128H172V122H128V128H80Z" fill="#9CC9F5"/>`+
+    `<path class="fg-l" d="M20 30V130H80V128M80 112V30M220 80V112M220 128V150H280V80"/>`+
+    `<path class="fg-l" d="M80 112H128V118H172V112H220M80 128H128V122H172V128H220"/>`+
+    `<path d="M80 50H262" stroke="#5B6579" stroke-dasharray="4 3"/>`+fArw(256,52,256,120,'fg-l','fg-k',7)+fArw(256,120,256,52,'fg-l','fg-k',7)+
+    fL(170,40,'水位の差 ＝ 電圧（V）','middle')+fCur(96,102,206,102)+fL(150,90,'水の流れ ＝ 電流（A）','middle','fg-t fg-red')+
+    fL(150,142,'細い管 ＝ 抵抗（Ω）','middle')+fL(50,145,'電池','middle','fg-ts'),'電気を水にたとえた図'),
+  ohm:()=>fSvg('0 0 340 130',
+    `<path class="fg-b" d="M90 10L160 120H20Z"/><path class="fg-l" d="M53 68H127M90 68V120"/>`+
+    fL(90,44,'V','middle','fg-big')+fL(66,96,'I','middle','fg-big')+fL(114,96,'R','middle','fg-big')+
+    fL(180,30,'電圧 V ＝ 電流 I × 抵抗 R','start')+fL(180,56,'電流 I ＝ 電圧 V ÷ 抵抗 R','start')+fL(180,82,'抵抗 R ＝ 電圧 V ÷ 電流 I','start')+
+    fL(180,108,'求めたい文字を指でかくすと式になる','start','fg-ts'),'オームの法則'),
+  mat:()=>fSvg('0 0 300 105',
+    fL(20,14,'← 電気を通しやすい','start','fg-ts')+fL(280,14,'通しにくい →','end','fg-ts')+
+    `<rect x="20" y="28" width="84" height="30" rx="6" fill="#F5C04A"/><rect x="108" y="28" width="84" height="30" rx="6" fill="#B7D3FF"/><rect x="196" y="28" width="84" height="30" rx="6" fill="#D5DAE3"/>`+
+    fL(62,43,'導体')+fL(150,43,'半導体')+fL(238,43,'絶縁体')+
+    fL(62,74,'銅・アルミ','middle','fg-ts')+fL(150,74,'シリコンなど','middle','fg-ts')+fL(238,74,'ゴム・ガラス','middle','fg-ts')+
+    fL(150,94,'条件で性質が変わる','middle','fg-ts fg-blue'),'導体・半導体・絶縁体'),
+  diode:()=>fSvg('0 0 300 100',
+    fP('diode',30,30)+fArw(105,30,150,30,'fg-cur','fg-curh',8)+fL(160,30,'この向きは流れる','start','fg-t fg-green')+
+    fP('diode',30,75)+fArw(150,75,105,75,'fg-l','fg-k',8)+fL(160,75,'逆向きは流れない','start','fg-t fg-red')+
+    `<path d="M120 66L134 84M134 66L120 84" stroke="#E8402F" stroke-width="3"/>`+fL(30,12,'＋','middle','fg-ts')+fL(90,12,'−','middle','fg-ts'),'ダイオードは一方通行'),
+  trIdea:()=>fSvg('0 0 300 190',
+    `<g transform="translate(110 95) scale(1.5)">${SYM.npn()}</g>`+fW('60,95 110,95')+fW('161,50 161,12')+fW('161,140 161,180')+
+    fArw(64,84,102,84,'fg-cur','fg-curh',7)+fL(64,72,'小さな電流','start','fg-ts fg-red')+
+    `<path d="M190 22V164" stroke="#E8402F" stroke-width="6" stroke-linecap="round"/>`+fHead(190,150,190,172,12,'fg-curh')+
+    fL(200,86,'大きな電流','start','fg-t fg-red')+fL(200,102,'（C → E）','start','fg-ts fg-red')+
+    fL(52,95,'B','end')+fL(168,22,'C','start')+fL(168,176,'E','start')+fL(110,140,'ベースの小さな電流で','middle','fg-ts')+fL(110,154,'大きな電流をON/OFF','middle','fg-ts'),'トランジスタのはたらき'),
+  bb:()=>{ const X=c=>40+(c-1)*26, rows=[['X',22],['A',48],['B',64],['C',80],['D',96],['E',112],['F',140],['G',156],['H',172],['I',188],['J',204],['Y',228]];
+    let p=`<rect x="4" y="4" width="302" height="240" rx="10" fill="#fff" stroke="#B9C3D4" stroke-width="2"/><rect x="30" y="120" width="252" height="12" rx="2" fill="#EEF1F6" stroke="#B9C2D3"/>`;
+    p+=`<rect x="28" y="14" width="258" height="16" rx="8" fill="#FFE0DC" stroke="#E8402F" stroke-width="1.5"/><rect x="28" y="220" width="258" height="16" rx="8" fill="#DCE8FF" stroke="#2F6FE0" stroke-width="1.5"/>`;
+    p+=`<rect x="${X(3)-9}" y="40" width="18" height="80" rx="8" fill="#FFE7C2" stroke="#F28A1E" stroke-width="1.5"/><rect x="${X(3)-9}" y="132" width="18" height="80" rx="8" fill="#DDF3E6" stroke="#1FA463" stroke-width="1.5"/>`;
+    p+=`<rect x="${X(7)-9}" y="40" width="18" height="80" rx="8" fill="#FFE7C2" stroke="#F28A1E" stroke-width="1.5"/>`;
+    rows.forEach(([r,y])=>{ p+=fL(16,y,r,'middle',r==='X'?'fg-t fg-red':r==='Y'?'fg-t fg-blue':'fg-t'); for(let c=1;c<=10;c++) p+=`<rect x="${X(c)-3.5}" y="${y-3.5}" width="7" height="7" fill="#fff" stroke="#3A4256" stroke-width="1.1"/>`; });
+    [3,7].forEach(c=>p+=fL(X(c),252,String(c),'middle','fg-ts'));
+    return fSvg('0 0 310 262',p,'ブレッドボードの中のつながり'); }
+};
+FIG.par2=()=>FIG.par(2); FIG.par4=()=>FIG.par(4); FIG.res=()=>FIG.resfig('res'); FIG.vr=()=>FIG.resfig('semi'); FIG.darkR=()=>FIG.dark(false); FIG.darkVR=()=>FIG.dark(true);
+
+// ブレッドボードの絵を、ページ内のidがぶつからないように取りこむ
+function boardSVG(parts,sfx){
+  return `<svg class="fig boardmini" viewBox="0 0 648 418" role="img" aria-label="ブレッドボードの実体配線図">`+
+    drawBoard(ordered(parts)).replace(/id="(\w+)"/g,`id="$1${sfx}"`).replace(/url\(#(\w+)\)/g,`url(#$1${sfx})`)+'</svg>';
+}
+
+// ===== きほんのステップごとの解説 =====
+const EX={
+  1:{h:'LEDってどんな部品？', figs:[['pLED','LEDの足と、電子用図記号'],['loop1','回路図：電池とLEDの「ひとまわりの道」']],
+    pts:['LED（発光ダイオード）は、電流が流れると光る<b>半導体</b>の部品です。',
+      '電流は <b>＋（長い足・アノード）から −（短い足・カソード）</b> の向きにしか流れません。逆向きにさすと光りません。',
+      '電流が流れるには、電池の＋から出て−にもどる<b>「ひとまわりの道（回路）」</b>が必要です。どこか1か所でも切れていると流れません。'],
+    more:['semi','半導体とLED']},
+  2:{h:'直列つなぎと電圧', figs:[['series','回路図：1本道の「直列つなぎ」'],['split','直列では、電池の電圧を2個で分け合う']],
+    pts:['部品を1本道にならべるつなぎ方を<b>「直列」</b>といいます。直列では、電池の電圧をそれぞれの部品で<b>分け合い</b>ます。',
+      'LEDは、1個あたりおよそ2V（赤や黄色のLEDの場合）の電圧がかからないと光りません。2個で分け合うと1個分が足りなくなり、<b>どちらも光らなく</b>なります。',
+      'では、2個とも光らせるには？ ➡ 次のステップで<b>「道を分ける」</b>つなぎ方をためします。'],
+    more:['series','直列と並列']},
+  3:{h:'並列つなぎ', figs:[['par2','回路図：道が2本に分かれた「並列つなぎ」']],
+    pts:['道を枝分かれさせて、部品を1個ずつ別の道につなぐのが<b>「並列」</b>です。',
+      '並列では、<b>どの道にも電池の電圧がそのままかかります</b>。だから2個とも光ります。',
+      '1つの道が切れても、ほかの道には電流が流れつづけます。家のコンセントやあかりも並列につながっています。'],
+    more:['series','直列と並列']},
+  4:{h:'並列で数をふやす', figs:[['par4','回路図：道を4本にした並列つなぎ']],
+    pts:['並列なら、<b>道をふやすだけ</b>でLEDを何個でもふやせます。どのLEDも同じ明るさで光ります。',
+      'そのかわり、電池から流れ出る電流は道の数だけ<b>合計されて大きく</b>なります。電池の減りが早くなります。',
+      'ブレッドボードの X列（＋）と Y列（−）は横一列につながっているので、並列の道をかんたんに作れます。'],
+    more:['bb','ブレッドボードのしくみ']},
+  5:{h:'抵抗器のはたらきと読み方', figs:[['pRes','抵抗の大きさは色の帯（カラーコード）で読む'],['res','回路図：抵抗器を入れた道と、入れない道']],
+    pts:['抵抗器は<b>電流を流れにくくする</b>部品です。LEDに流れる電流をおさえて、LEDを守ったり明るさを調整したりします。',
+      '電圧・電流・抵抗には <b>「電圧 ＝ 抵抗 × 電流」（オームの法則）</b> の関係があります。抵抗が大きいほど電流は小さくなります。',
+      '抵抗の大きさ（単位 Ω：オーム）は色の帯で読みます。茶・黒・橙なら「1・0・0が3こ」で 10000Ω ＝ <b>10kΩ</b>。'],
+    more:['ohm','オームの法則']},
+  6:{h:'半固定抵抗（ボリューム）', figs:[['pVR','半固定抵抗の3本の足'],['vr','回路図：半固定抵抗でLEDの明るさを変える']],
+    pts:['半固定抵抗は、<b>つまみを回すと抵抗の大きさが変わる</b>部品です。3本の足のうち、真ん中の足がつまみとつながっています。',
+      '真ん中の足と、はしの足のあいだを使うと「大きさを変えられる抵抗器」になり、つまみでLEDの明るさが変わります。',
+      'このあとのセンサー回路では、<b>「どれくらい暗くなったら反応するか（感度）」</b>や<b>「ゆっくり消える時間」</b>の調整に使います。'],
+    more:['parts','いろいろな部品']},
+  7:{h:'トランジスタとCdS', figs:[['pTR','トランジスタの足（E・C・B）と記号'],['pCdS','CdSは暗いほど抵抗が大きい'],['darkR','回路図：暗くなるとLEDがつく']],
+    pts:['トランジスタは、<b>B（ベース）に小さな電流が流れると、C（コレクタ）から E（エミッタ）へ大きな電流を流す</b>スイッチのはたらきをします。',
+      'CdS は光のセンサーで、<b>明るいと抵抗が小さく、暗いと抵抗が大きく</b>なります。',
+      '暗くなる → CdSの抵抗が大きくなる → 68kΩを通ってBに電流が流れこむ → トランジスタがON → <b>LEDが光る</b>、の順に動きます。'],
+    more:['semi','半導体（トランジスタ）']},
+  8:{h:'感度を調整する', figs:[['darkVR','回路図：68kΩを半固定抵抗に取りかえた'],['pVR','半固定抵抗']],
+    pts:['ステップ7の 68kΩ を、<b>100kΩの半固定抵抗</b>に取りかえました。',
+      'つまみを回すと、Bに流れこむ電流の大きさが変わります。そのため<b>「どれくらいの暗さでLEDがつくか（感度）」</b>を自分で決められます。',
+      '「センサーと抵抗で電圧を分け、その電圧でトランジスタを動かす」──これは回路をえらぶの回路でも使われている<b>基本の形</b>です。回路図と実体配線図を見くらべてみよう。'],
+    more:['schematic','回路図の読み方']},
+  9:{h:'人感センサー', figs:[['pPIR','人感センサーの3本の足'],['pir','回路図：人感センサーでLEDをつける']],
+    pts:['人感センサー（焦電型赤外線センサー）は、<b>人の体から出ている赤外線の変化</b>を感じとります。',
+      '人が動くと <b>Vo（出力）</b>の足から電気が出て、10kΩを通ってLEDが光ります。CdS回路とちがい、センサーの中に増幅する回路が入っています。',
+      '3本の足には <b>V+（電源の＋）・Vo（出力）・V−（電源の−）</b> の役わりがあります。向きをまちがえると動きません。'],
+    more:['parts','いろいろな部品（センサー）']},
+  10:{h:'メロディICとスピーカー', figs:[['pMel','メロディICとスピーカー'],['mel','回路図：メロディを鳴らす']],
+    pts:['メロディICは、電気を流すと<b>曲の電気信号をつくる</b>部品（IC＝集積回路）です。その信号をスピーカーが<b>音</b>に変えます。',
+      '2つのトランジスタは、<b>メロディICに電気を流すかどうかを切りかえるスイッチ</b>です。ここでは 200kΩ でいつもONにしているので、電源を入れるとすぐ鳴ります。',
+      'ステップ11では、このスイッチを<b>コンデンサの回路</b>で動かして、「じわっと」鳴らしたり止めたりします。'],
+    more:['symbols','電子用図記号']},
+  '11-1':{h:'コンデンサとオンディレイ', figs:[['pCap','電解コンデンサの足と記号'],['dOn','オンディレイ：ゆっくり鳴りはじめ、ゆっくり止まる']],
+    pts:['コンデンサは<b>電気を一時的にためる</b>部品です。ためられる量は µF（マイクロファラド）で表します。',
+      '人を感じると、1MΩの半固定抵抗を通ってコンデンサに<b>少しずつ</b>電気がたまります。たまるにつれてトランジスタに流れる電流がふえ、メロディが<b>「じわっと」</b>大きくなります。',
+      '1MΩのつまみで、電気のたまる速さ（＝鳴りはじめるまでの時間）を変えられます。押しボタンを押すとコンデンサの電気が逃げて、すぐにリセットされます。'],
+    more:['parts','いろいろな部品（コンデンサ）']},
+  '11-2':{h:'オフディレイ', figs:[['dOff','オフディレイ：すぐつき、ゆっくり消える'],['pCap','電解コンデンサ']],
+    pts:['人を感じると、コンデンサに<b>すぐ</b>電気がたまり、LEDがすぐ光ります。',
+      '人がいなくなると、コンデンサにたまった電気が1MΩの半固定抵抗を通って<b>少しずつ出ていきます</b>。そのあいだLEDは光りつづけ、「じわっと」消えます。',
+      'つまみで抵抗を大きくすると、電気が出ていくのに時間がかかり、<b>長く光る</b>ようになります。これが「②回路をえらぶ」の<b>動き方（オフディレイ・オンディレイ）</b>です。'],
+    more:['quiz','確認テストにちょうせん']}
+};
+function renderExplain(s){
+  const e=EX[s.n]; const box=$('#bExplain'); if(!e){ box.hidden=true; return; }
+  box.hidden=false;
+  $('#exTitle').textContent=e.h;
+  $('#exFigs').innerHTML=e.figs.map(([k,cap])=>`<figure class="exfig">${FIG[k]()}<figcaption>${cap}</figcaption></figure>`).join('');
+  $('#exPts').innerHTML=e.pts.map(p=>`<li>${p}</li>`).join('');
+  const m=$('#exMore'); const q=e.more[0]==='quiz';
+  m.dataset.go = q ? 'quiz' : 'learn:'+e.more[0];
+  m.className = q ? 'lk q' : 'lk';
+  m.textContent = q ? `✏️ ${e.more[1]} →` : `📖 もっとくわしく：③しくみを知る「${e.more[1]}」 →`;
+}
+
+// ===== ③しくみを知る =====
+const SYMLIST=[
+  ['bat','電池（直流電源）','長い線が＋、短く太い線が−'],['res','抵抗器','電流を流れにくくする'],
+  ['vr','可変抵抗器','つまみで抵抗を変えられる'],['semi','半固定抵抗器','ドライバーなどで調整して使う'],
+  ['diode','ダイオード','三角の向きにだけ電流が流れる'],['led','発光ダイオード（LED）','外向きの矢印は「光が出る」'],
+  ['npn','トランジスタ（NPN形）','矢印が外向き　例：C1815'],['pnp','トランジスタ（PNP形）','矢印が内向き　例：A1015'],
+  ['cap','コンデンサ（有極性）','＋の印がある側が＋'],['cds','光導電セル（CdS）','入ってくる矢印は「光」'],
+  ['sw','押しボタンスイッチ','押している間だけつながる'],['lamp','ランプ（電球）','電流が流れると光る'],
+  ['spk','スピーカー','電気信号を音に変える'],['mic','マイクロホン','音を電気信号に変える'],
+  ['join','導線の接続','黒丸（●）があればつながっている'],['cross','導線の交差','黒丸がなければつながっていない']
+];
+const LEARN=[
+  {id:'current', t:'電流・電圧・抵抗', ic:'💧', body:()=>`
+    <p class="lead">電気は目に見えないので、<b>水の流れ</b>にたとえると考えやすくなります。</p>
+    <figure class="figbox">${FIG.water()}<figcaption>高いところの水ほど強く流れようとし（電圧）、細い管ほど流れにくい（抵抗）</figcaption></figure>
+    <div class="kv">
+      <div><span class="u">A</span><b>電流（アンペア）</b><span>電気の流れの量。1A＝1000mA（ミリアンペア）。LEDに流すのは10〜20mAくらい。</span></div>
+      <div><span class="u">V</span><b>電圧（ボルト）</b><span>電流を流そうとするはたらきの大きさ。乾電池1本は1.5V。</span></div>
+      <div><span class="u">Ω</span><b>抵抗（オーム）</b><span>電流の流れにくさ。1kΩ＝1000Ω、1MΩ＝1000kΩ。</span></div>
+    </div>
+    <h3>電流が流れる条件</h3>
+    <ul class="rules"><li>電流は電池の<b>＋極から出て、−極にもどります</b>。</li><li>途中が1か所でも切れていると流れません。このひとまわりの道を<b>回路</b>といいます。</li><li>＋と−を部品を通さずに直接つなぐと大きな電流が流れ（<b>ショート</b>）、電池や部品が熱くなって危険です。</li></ul>
+    <button class="lk t" data-go="basics:1">①きほんを学ぶ ステップ1で、ひとまわりの道を作る →</button>`},
+  {id:'ohm', t:'オームの法則', ic:'🧮', body:()=>`
+    <p class="lead">電圧・電流・抵抗のあいだには、決まった関係があります。これを<b>オームの法則</b>といいます。</p>
+    <figure class="figbox">${FIG.ohm()}</figure>
+    <h3>ためしに計算してみよう</h3>
+    <div class="calc">
+      <label>電圧 V<input type="range" id="cV" min="1.5" max="9" step="0.5" value="3"><output id="cVo"></output></label>
+      <label>抵抗 R<input type="range" id="cR" min="0" max="10" step="1" value="4"><output id="cRo"></output></label>
+      <p class="cres" id="cRes"></p><div class="cbar"><div id="cBar"></div></div>
+    </div>
+    <p>例：3Vの電池に150Ωの抵抗をつなぐと、3 ÷ 150 ＝ 0.02A ＝ <b>20mA</b> の電流が流れます。</p>
+    <p class="tip">LEDと抵抗をつなぐときは、LED自体にもおよそ2Vかかります。そのため流れる電流は「（電池の電圧 − 約2V）÷ 抵抗」でおおよそ見積もれます。</p>
+    <h3>電力（W：ワット）</h3>
+    <p>電気がする仕事の大きさを<b>電力</b>といい、<b>電力（W）＝ 電圧（V）× 電流（A）</b> で求めます。3Vで0.1A流れると 0.3W です。</p>`},
+  {id:'series', t:'直列と並列', ic:'🔀', body:()=>`
+    <p class="lead">部品のつなぎ方には、<b>直列</b>（1本道）と<b>並列</b>（枝分かれ）の2つがあります。</p>
+    <div class="two"><figure class="figbox">${FIG.series()}<figcaption>直列つなぎ</figcaption></figure><figure class="figbox">${FIG.par(2)}<figcaption>並列つなぎ</figcaption></figure></div>
+    <table class="cmp"><thead><tr><th></th><th>直列</th><th>並列</th></tr></thead><tbody>
+      <tr><th>電流</th><td>どこも同じ大きさ</td><td>道ごとに分かれる（合計が電池から流れ出る）</td></tr>
+      <tr><th>電圧</th><td>部品どうしで分け合う</td><td>どの道も電池と同じ</td></tr>
+      <tr><th>1個外すと</th><td>全部止まる</td><td>ほかの道は動きつづける</td></tr>
+      <tr><th>LED2個</th><td>電圧が足りず光らない（このキット）</td><td>2個とも光る</td></tr>
+    </tbody></table>
+    <figure class="figbox">${FIG.split()}<figcaption>直列ではLED1個あたりの電圧が足りなくなる</figcaption></figure>
+    <button class="lk t" data-go="basics:2">①きほんを学ぶ ステップ2・3でためす →</button>`},
+  {id:'semi', t:'半導体', ic:'💎', body:()=>`
+    <p class="lead">LEDやトランジスタは<b>半導体</b>でできています。半導体は、電気を通す「導体」と通さない「絶縁体」の中間の性質をもつ物質です。</p>
+    <figure class="figbox">${FIG.mat()}</figure>
+    <p>代表的な半導体は<b>シリコン（ケイ素）</b>です。シリコンにごくわずかな別の物質を混ぜると、電気の通り方がちがう<b>p形</b>と<b>n形</b>の半導体ができます。これを組み合わせて、いろいろな部品を作ります。</p>
+    <h3>ダイオード　─ 一方通行の部品</h3>
+    <p>p形とn形をつなぎ合わせたものが<b>ダイオード</b>です。電流を<b>一方向にしか流さない</b>性質があります。</p>
+    <figure class="figbox">${FIG.diode()}</figure>
+    <h3>LED（発光ダイオード）</h3>
+    <div class="two"><figure class="figbox">${FIG.pLED()}</figure><div><p>LEDはダイオードの一種で、電流が流れると<b>光る</b>半導体です。電球より少ない電気で光り、長もちします。</p><p>＋側を<b>アノード</b>（長い足）、−側を<b>カソード</b>（短い足）といいます。</p></div></div>
+    <h3>トランジスタ　─ 小さな電流で大きな電流を動かす</h3>
+    <div class="two"><figure class="figbox">${FIG.trIdea()}</figure><figure class="figbox">${FIG.pTR()}</figure></div>
+    <p>トランジスタは、n形・p形の半導体を3層に重ねた部品です。3本の足を<b>E（エミッタ）・C（コレクタ）・B（ベース）</b>といいます。</p>
+    <ul class="rules"><li><b>スイッチ作用</b>：Bに小さな電流が流れると、CからEへ大きな電流が流れる（ON）。Bに流れなければ止まる（OFF）。</li><li><b>増幅作用</b>：Bの小さな電流の変化を、Cの大きな電流の変化にする。</li><li>回路ナビでは <b>C1815（NPN形）</b> と <b>A1015（PNP形）</b> を使います。</li></ul>
+    <p class="tip">メロディICの「IC（集積回路）」は、たくさんのトランジスタなどを小さな1つの部品にまとめたものです。</p>`},
+  {id:'parts', t:'いろいろな部品', ic:'🧩', body:()=>`
+    <p class="lead">回路ナビで使う部品のはたらきと、気をつけるところをまとめます。</p>
+    <h3>抵抗器　─ カラーコードの読み方</h3>
+    <figure class="figbox">${FIG.pRes()}<figcaption>1本目・2本目が数字、3本目が「0の数」、4本目（金）は誤差±5%</figcaption></figure>
+    <p>回路ナビで使う抵抗：150Ω（茶・緑・茶）／1kΩ（茶・黒・赤）／4.7kΩ（黄・紫・赤）／10kΩ（茶・黒・橙）／22kΩ（赤・赤・橙）／68kΩ（青・灰・橙）／200kΩ（赤・黒・黄）</p>
+    <h3>半固定抵抗</h3>
+    <figure class="figbox">${FIG.pVR()}</figure>
+    <h3>CdS（光導電セル）</h3>
+    <figure class="figbox">${FIG.pCdS()}</figure>
+    <p>光が当たると抵抗が小さくなる光センサーです。向きはありません。</p>
+    <h3>コンデンサ</h3>
+    <figure class="figbox">${FIG.pCap()}</figure>
+    <p>電気を一時的にためる部品です。電解コンデンサには<b>＋と−の向き（極性）</b>があり、逆にさすとこわれることがあります。回路ナビでは、抵抗と組み合わせて<b>「ゆっくり消える・ゆっくり鳴りだす」時間</b>をつくっています。</p>
+    <h3>センサーいろいろ</h3>
+    <div class="kv">
+      <div><b>人感センサー</b><span>人の体から出る赤外線の変化を感じとる。V+・Vo・V− の3本足。</span></div>
+      <div><b>マイク</b><span>音（空気のふるえ）を電気の信号に変える。＋と−の向きがある。</span></div>
+      <div><b>赤外線受光センサー</b><span>リモコンの赤外線を受けると反応する。3本の足に役わりがある。</span></div>
+    </div>
+    <figure class="figbox">${FIG.pPIR()}</figure>`},
+  {id:'symbols', t:'電子用図記号', ic:'🔣', body:()=>`
+    <p class="lead">回路図では、部品を<b>電子用図記号</b>で表します。日本では <b>JIS（日本産業規格）</b> で形が決められています。</p>
+    <div class="symgrid">${SYMLIST.map(([k,n,d])=>`<div class="sym">${symSVG(k)}<b>${n}</b><span>${d}</span></div>`).join('')}</div>
+    <p class="tip">記号は、向きを変えたり（縦・横）、裏返したりして描いてもかまいません。つながり方が同じなら同じ回路です。</p>
+    <button class="lk q" data-go="quiz">✏️ 図記号の問題にちょうせん →</button>`},
+  {id:'schematic', t:'回路図の読み方', ic:'📐', body:()=>`
+    <p class="lead"><b>回路図</b>は「部品がどうつながっているか」を記号で表した図、<b>実体配線図</b>は「部品が実際にどこにあるか」を表した図です。</p>
+    <h3>回路図のルール</h3>
+    <ol class="rules">
+      <li>線は導線を表します。線をたどると電流の道がわかります。</li>
+      <li>線が交わるところに<b>黒丸（●）があればつながっている</b>、なければつながっていません。</li>
+      <li>電池の記号は<b>長い線が＋</b>です。ふつう、＋を上、−を下に描きます。</li>
+      <li>部品の位置は実物と同じでなくてかまいません。<b>つながり方</b>が同じなら同じ回路です。</li>
+    </ol>
+    <div class="two"><figure class="figbox">${symSVG('join').replace('<svg','<svg class="fig" style="height:70px"')}<figcaption>接続している</figcaption></figure><figure class="figbox">${symSVG('cross').replace('<svg','<svg class="fig" style="height:70px"')}<figcaption>交差しているだけ</figcaption></figure></div>
+    <h3>見くらべてみよう：暗くなるとLEDがつく回路</h3>
+    <div class="two"><figure class="figbox">${FIG.dark(false)}<figcaption>回路図</figcaption></figure><figure class="figbox">${boardSVG(BASICS[6].parts,'_lc')}<figcaption>実体配線図（ブレッドボード）</figcaption></figure></div>
+    <p>回路図の「68kΩ と CdS のあいだ（●）」は、ブレッドボードでは<b>8列目</b>にあたります。68kΩ（上側の C-8）と、トランジスタのB（H-8）・CdS（J-8）がある下側を、ジャンパー線（E-8〜F-8）でつないでいます。形はちがっても、<b>つながり方は同じ</b>です。</p>
+    <button class="lk t" data-go="basics:7">①きほんを学ぶ ステップ7を開く →</button>`},
+  {id:'bb', t:'ブレッドボードのしくみ', ic:'🔌', body:()=>`
+    <p class="lead">ブレッドボードは、部品の足を穴にさすだけで回路が作れる板です。はんだ付けがいらないので、何度でも作り直せます。</p>
+    <div class="two"><figure class="figbox">${FIG.bb()}<figcaption>色のついた穴どうしが、中でつながっている</figcaption></figure>
+    <ul class="rules">
+      <li><b style="color:#B35A00">同じ列番号の A〜E の5つの穴</b>は、中でつながっています（だいだい色）。</li>
+      <li><b style="color:#14804A">F〜J の5つの穴</b>も同じです（みどり色）。</li>
+      <li>真ん中の溝をはさんだ <b>E と F はつながっていません</b>。</li>
+      <li><b style="color:#D9311F">X列（＋）</b>と<b style="color:#2558C9">Y列（−）</b>は、横一列につながった電源用の列です。</li>
+      <li>となりの列（3列目と4列目など）は、つながっていません。</li>
+    </ul></div>
+    <p class="tip">⚠ 1つの部品の2本の足を、<b>つながっている同じグループの穴</b>にさすと、電流が部品を通らず素通りしてしまい、部品がはたらきません。</p>
+    <button class="lk t" data-go="basics:1">①きほんを学ぶで作ってみる →</button>`}
+];
+const OHM_R=[10,22,47,100,150,220,470,1000,2200,4700,10000];
+function fmtI(I){ const m=I*1000; return I>=1 ? I.toFixed(2)+'A' : (m>=10 ? m.toFixed(0) : m>=1 ? m.toFixed(1) : m.toFixed(2))+'mA'; }
+function bindOhm(){
+  const v=$('#cV'), r=$('#cR'); if(!v) return;
+  const up=()=>{ const V=+v.value, R=OHM_R[+r.value], I=V/R;
+    $('#cVo').textContent=V.toFixed(1)+'V'; $('#cRo').textContent= R>=1000 ? (R/1000)+'kΩ' : R+'Ω';
+    $('#cRes').innerHTML=`電流 I ＝ ${V.toFixed(1)} ÷ ${R} ＝ <b>${fmtI(I)}</b>`;
+    $('#cBar').style.width=Math.min(100,I*1000/300*100).toFixed(1)+'%'; };
+  v.oninput=r.oninput=up; up();
+}
+function renderLearn(){
+  let i=LEARN.findIndex(c=>c.id===learnCh); if(i<0){ i=0; learnCh=LEARN[0].id; }
+  $('#lChips').innerHTML=LEARN.map((c,k)=>`<button class="lchip" type="button" data-ch="${c.id}" aria-pressed="${c.id===learnCh}">${k+1}. ${c.t}</button>`).join('');
+  $('#lBody').innerHTML=`<p class="lno">第${i+1}章 / 全${LEARN.length}章</p><h2 class="r">${LEARN[i].ic} ${LEARN[i].t}</h2>`+LEARN[i].body();
+  $('#lPrev').disabled=i===0;
+  $('#lNext').textContent= i===LEARN.length-1 ? '✏️ 確認テストへ ▶' : '次の章 ▶';
+  if(learnCh==='ohm') bindOhm();
+}
+
+// ===== ④確認テスト =====
+const QCAT={ele:'電気の基礎',semi:'半導体',parts:'いろいろな部品',sym:'図記号・回路図',bb:'ブレッドボード・動き方'};
+// a[0] が正解（表示するときに並びをシャッフル）。f は図記号を出すとき。
+const QUIZ=[
+  {c:'ele',q:'電流の単位はどれ？',a:['A（アンペア）','V（ボルト）','Ω（オーム）','W（ワット）'],e:'電流は「電気の流れの量」で、単位は A（アンペア）。1A＝1000mA です。'},
+  {c:'ele',q:'電圧の単位はどれ？',a:['V（ボルト）','A（アンペア）','Ω（オーム）','Hz（ヘルツ）'],e:'電圧は「電流を流そうとするはたらきの大きさ」で、単位は V（ボルト）。乾電池1本は1.5Vです。'},
+  {c:'ele',q:'抵抗の単位はどれ？',a:['Ω（オーム）','V（ボルト）','A（アンペア）','W（ワット）'],e:'抵抗は「電流の流れにくさ」で、単位は Ω（オーム）。1kΩ＝1000Ω です。'},
+  {c:'ele',q:'「電流の流れにくさ」を表す量は？',a:['抵抗','電圧','電流','電力'],e:'流れにくさは抵抗。水のたとえでは「細い管」にあたります。'},
+  {c:'ele',q:'3Vの電圧を100Ωの抵抗にかけたとき、流れる電流は？',a:['0.03A（30mA）','0.3A（300mA）','3A','300A'],e:'オームの法則より、電流 ＝ 電圧 ÷ 抵抗 ＝ 3 ÷ 100 ＝ 0.03A（30mA）です。'},
+  {c:'ele',q:'抵抗に4Vの電圧をかけると0.02Aの電流が流れた。抵抗の大きさは？',a:['200Ω','80Ω','0.08Ω','2000Ω'],e:'抵抗 ＝ 電圧 ÷ 電流 ＝ 4 ÷ 0.02 ＝ 200Ω です。'},
+  {c:'ele',q:'電圧が同じとき、抵抗を大きくすると電流はどうなる？',a:['小さくなる','大きくなる','変わらない','電圧が大きくなる'],e:'電流 ＝ 電圧 ÷ 抵抗 なので、抵抗が大きいほど電流は小さくなります。'},
+  {c:'ele',q:'電流が流れるために必要なことは？',a:['電池の＋から−まで、ひとまわりの道がつながっていること','電池の＋側だけに部品をつなぐこと','導線をできるだけ長くすること','部品をすべて同じ色にそろえること'],e:'電流は＋極から出て−極にもどります。この「ひとまわりの道」を回路といいます。'},
+  {c:'ele',q:'直列につないだLEDのうち、1個を外すとどうなる？',a:['ほかのLEDも消える','ほかのLEDは光ったまま','ほかのLEDが明るくなる','電池がこわれる'],e:'直列は道が1本なので、1か所切れると全部に電流が流れなくなります。'},
+  {c:'ele',q:'並列につないだLEDのうち、1個を外すとどうなる？',a:['ほかのLEDは光ったまま','ほかのLEDも消える','ほかのLEDが点めつする','電池がこわれる'],e:'並列は道が分かれているので、1つの道が切れても、ほかの道には電流が流れつづけます。'},
+  {c:'ele',q:'並列回路で、それぞれの道にかかる電圧は？',a:['電池の電圧と同じ','電池の電圧を道の数で割った大きさ','0V','電池の電圧の2倍'],e:'並列では、どの道にも電池の電圧がそのままかかります。'},
+  {c:'ele',q:'直列回路で、それぞれの部品を流れる電流は？',a:['どこも同じ','電池に近いほど大きい','電池から遠いほど大きい','部品ごとにばらばら'],e:'直列は道が1本なので、どこを流れる電流も同じ大きさです。電圧は部品どうしで分け合います。'},
+  {c:'ele',q:'このキットで、LED2個を1本道（直列）につなぐと光らなかった。理由は？',a:['1個あたりの電圧が足りなくなるから','電流が多すぎてLEDがこわれるから','LEDは直列につなげない部品だから','ブレッドボードの穴がつながっていないから'],e:'直列では電池の電圧を2個で分け合います。LEDは1個あたり約2Vないと光らないので、足りなくなります。電圧の大きい電源なら直列でも光ります。'},
+  {c:'ele',q:'電力（W）を求める式はどれ？',a:['電圧 × 電流','電圧 ÷ 電流','電流 ÷ 電圧','抵抗 × 抵抗'],e:'電力（W）＝ 電圧（V）× 電流（A）。3Vで0.1A流れると0.3Wです。'},
+  {c:'semi',q:'電気を通しやすい「導体」と通しにくい「絶縁体」の、中間の性質をもつ物質は？',a:['半導体','超伝導体','誘電体','磁性体'],e:'半導体は、条件によって電気の通しやすさが変わる物質です。LEDやトランジスタの材料です。'},
+  {c:'semi',q:'半導体の材料として最も代表的なものは？',a:['シリコン（ケイ素）','銅','ゴム','ガラス'],e:'シリコンが代表的です。銅は導体、ゴムやガラスは絶縁体です。'},
+  {c:'semi',q:'ダイオードの性質は？',a:['電流を一方向にしか流さない','電気をためる','音を電気の信号に変える','抵抗の大きさを変えられる'],e:'ダイオードは「一方通行」の部品です。逆向きには電流が流れません。'},
+  {c:'semi',q:'LEDの日本語の名前は？',a:['発光ダイオード','発光トランジスタ','光導電セル','集積回路'],e:'LED（Light Emitting Diode）＝発光ダイオード。ダイオードの一種です。'},
+  {c:'semi',q:'LEDの＋（アノード）はどちらの足？',a:['長い足','短い足','どちらでもよい','真ん中の足'],e:'長い足が＋（アノード）、短い足が−（カソード）。逆にさすと光りません。'},
+  {c:'semi',q:'トランジスタの3本の足の名前の組み合わせは？',a:['エミッタ・コレクタ・ベース','アノード・カソード・ゲート','プラス・マイナス・アース','インプット・アウトプット・ベース'],e:'E（エミッタ）・C（コレクタ）・B（ベース）。C1815は、文字の面を手前にして左から E・C・B です。'},
+  {c:'semi',q:'回路ナビの回路で、トランジスタのおもなはたらきは？',a:['小さな電流で、大きな電流を流したり止めたりする','電気をためて少しずつ流す','電流を一方向にだけ流す','光を電気に変える'],e:'B（ベース）に小さな電流が流れると、CからEへ大きな電流が流れます。スイッチのはたらきです。'},
+  {c:'semi',q:'ベースの小さな電流の変化を、コレクタの大きな電流の変化にするはたらきを何という？',a:['増幅作用','整流作用','発光作用','蓄電作用'],e:'これを増幅作用といいます。ONとOFFを切りかえるはたらきはスイッチ作用です。'},
+  {c:'semi',q:'C1815 はどちらの形のトランジスタ？',a:['NPN形','PNP形','どちらでもない','NPN形とPNP形の両方'],e:'C1815はNPN形、A1015はPNP形です。記号では、NPN形はエミッタの矢印が外向きです。'},
+  {c:'semi',q:'メロディICの「IC」とは何の略？',a:['集積回路','発光ダイオード','可変抵抗器','電解コンデンサ'],e:'IC（Integrated Circuit）＝集積回路。たくさんのトランジスタなどを1つの部品にまとめたものです。'},
+  {c:'parts',q:'CdS は、暗くなると抵抗がどうなる？',a:['大きくなる','小さくなる','変わらない','0になる'],e:'CdSは明るいと抵抗が小さく、暗いと抵抗が大きくなります。'},
+  {c:'parts',q:'コンデンサのはたらきは？',a:['電気を一時的にためる','電流を一方向にだけ流す','光を出す','音を出す'],e:'コンデンサは電気をためる部品です。回路ナビでは「ゆっくり消える」時間をつくっています。'},
+  {c:'parts',q:'電解コンデンサで気をつけることは？',a:['＋と−の向き（極性）がある','どの向きにさしてもよい','必ず2個いっしょに使う','光に当ててはいけない'],e:'電解コンデンサには極性があります。長い足が＋、帯のある側が−。逆にさすとこわれることがあります。'},
+  {c:'parts',q:'抵抗の色の帯が「茶・黒・橙」のとき、抵抗の大きさは？',a:['10kΩ','1kΩ','100kΩ','103Ω'],e:'茶＝1、黒＝0、橙＝0が3こ。10000Ω＝10kΩ です。'},
+  {c:'parts',q:'抵抗の色の帯が「赤・赤・橙」のとき、抵抗の大きさは？',a:['22kΩ','2.2kΩ','220kΩ','223Ω'],e:'赤＝2、赤＝2、橙＝0が3こ。22000Ω＝22kΩ です。'},
+  {c:'parts',q:'半固定抵抗のつまみを回すと、何が変わる？',a:['抵抗の大きさ','電池の電圧','LEDの色','コンデンサの極性'],e:'つまみで抵抗の大きさが変わります。回路ナビでは感度や、ゆっくり消える時間の調整に使います。'},
+  {c:'parts',q:'人感センサーが感じとっているものは？',a:['人の体から出る赤外線の変化','人の声','人の重さ','部屋の明るさ'],e:'人感センサー（焦電型赤外線センサー）は、人の体から出る赤外線の変化を感じとります。'},
+  {c:'parts',q:'コンデンサの容量の単位「µF」の読み方は？',a:['マイクロファラド','ミリアンペア','メガオーム','マイクロボルト'],e:'µF＝マイクロファラド。回路ナビでは47µFのコンデンサを使います。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'res',a:['抵抗器','コンデンサ','電池','スイッチ'],e:'長方形の記号は抵抗器です。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'led',a:['発光ダイオード（LED）','ダイオード','トランジスタ','ランプ'],e:'ダイオードの記号に、外向きの矢印（光）がついたものがLEDです。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'bat',a:['電池（直流電源）','コンデンサ','スイッチ','抵抗器'],e:'長い線と短く太い線の組み合わせは電池です。長い線が＋です。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'npn',a:['トランジスタ','ダイオード','ランプ','マイクロホン'],e:'円の中に3本の線があり、矢印がついているのはトランジスタです。矢印が外向きならNPN形。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'cap',a:['コンデンサ','電池','スイッチ','抵抗器'],e:'同じ長さの2本の線が向かい合っているのはコンデンサです。＋の印は有極性（電解コンデンサ）。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'cds',a:['光導電セル（CdS）','発光ダイオード','可変抵抗器','ランプ'],e:'抵抗器の記号に、外から入ってくる矢印（光）がついたものがCdSです。LEDの矢印は外向きです。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'sw',a:['押しボタンスイッチ','コンデンサ','電池','ランプ'],e:'押している間だけつながる押しボタンスイッチの記号です。'},
+  {c:'sym',q:'この電子用図記号は何？',f:'diode',a:['ダイオード','発光ダイオード（LED）','トランジスタ','抵抗器'],e:'三角と線の組み合わせがダイオード。三角の向きに電流が流れます。矢印がなければLEDではありません。'},
+  {c:'sym',q:'電池の図記号で、長いほうの線はどちらの極？',a:['＋極','−極','どちらでもない','つながっていない'],e:'長い線が＋極、短く太い線が−極です。'},
+  {c:'sym',q:'回路図で、導線が交わる点に黒丸（●）があるときは？',a:['導線どうしがつながっている','導線どうしはつながっていない','そこに部品がある','そこで電流が止まる'],e:'黒丸があればつながっています。黒丸がなく交差しているだけなら、つながっていません。'},
+  {c:'sym',q:'日本で電子用図記号の形を決めている規格は？',a:['JIS（日本産業規格）','JAS（日本農林規格）','PSE（電気用品安全法）','SDGs'],e:'電子用図記号は JIS（JIS C 0617）で決められています。'},
+  {c:'sym',q:'「回路図」と「実体配線図」のちがいは？',a:['回路図はつながり方を、実体配線図は部品の実際の位置や形を表す','回路図は写真、実体配線図は記号で表す','どちらもまったく同じもの','回路図には電池を描かない'],e:'回路図はつながり方を記号で、実体配線図（ブレッドボードの図）は実際の配置を表します。'},
+  {c:'bb',q:'ブレッドボードで、同じ列番号の A〜E の5つの穴は？',a:['中でつながっている','どれもつながっていない','となりの列とつながっている','F〜J とつながっている'],e:'同じ列番号の A〜E の5つの穴は中でつながっています。F〜J も同じです。'},
+  {c:'bb',q:'ブレッドボードの「E-10」と「F-10」は？',a:['真ん中の溝で分かれていて、つながっていない','つながっている','X列とつながっている','Y列とつながっている'],e:'真ん中の溝をはさんだ E と F はつながっていません。'},
+  {c:'bb',q:'ブレッドボードの X列（赤・＋）は？',a:['横一列につながった電源（＋）用の列','どの穴もつながっていない列','LED専用の列','Y列とつながっている列'],e:'X列（＋）とY列（−）は、横一列につながった電源用の列です。'},
+  {c:'bb',q:'1つの部品の2本の足を、同じ列の A〜E の穴にさすとどうなる？',a:['電流が部品を通らず、部品がはたらかない','部品が2倍の力ではたらく','電池が長もちする','とくに変わらない'],e:'A〜Eの5つの穴は中でつながっているので、電流が部品を通らずに素通りしてしまいます。'},
+  {c:'bb',q:'「オフディレイ」の動き方は？',a:['すぐ動いて、ゆっくり止まる','ゆっくり動きだし、ゆっくり止まる','すぐ動いて、すぐ止まる','ずっと動きつづける'],e:'オフディレイは「止まるのがおくれる」動き方です。'},
+  {c:'bb',q:'「オンディレイ」の動き方は？',a:['ゆっくり動きだし、ゆっくり止まる','すぐ動いて、ゆっくり止まる','すぐ動いて、すぐ止まる','動かない'],e:'オンディレイは「動きだすのがおくれる」動き方です（回路ナビの回路はゆっくり止まります）。'},
+  {c:'bb',q:'「ゆっくり止まる」時間をつくっている部品の組み合わせは？',a:['コンデンサと抵抗','LEDとスイッチ','CdSとスピーカー','電池と導線'],e:'コンデンサにたまった電気が抵抗を通って少しずつ出ていくので、ゆっくり止まります。'},
+  {c:'bb',q:'回路ナビの回路で、リセットボタン（押しボタン）を押すとどうなる？',a:['コンデンサの電気が逃げて、すぐに止まる','LEDがもっと明るくなる','メロディの曲が変わる','電池が充電される'],e:'押しボタンでコンデンサの電気を逃がすので、すぐにリセットされます。'}
+];
+const qs={phase:'start',cat:'all',n:10,list:[],i:0,picked:-1,score:0,wrong:[]};
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const qPool=()=>qs.cat==='all'?QUIZ:QUIZ.filter(q=>q.c===qs.cat);
+function quizStart(pool){
+  qs.list=shuffle(pool).slice(0, qs.n==='all'?pool.length:Math.min(qs.n,pool.length)).map(q=>Object.assign({},q,{ord:shuffle([0,1,2,3])}));
+  qs.i=0; qs.picked=-1; qs.score=0; qs.wrong=[]; qs.phase='q'; renderQuiz();
+}
+function renderQuiz(){
+  const box=$('#qBox');
+  if(qs.phase==='start'){
+    const cats=[['all','すべて',QUIZ.length]].concat(Object.keys(QCAT).map(k=>[k,QCAT[k],QUIZ.filter(q=>q.c===k).length]));
+    box.innerHTML=`<h2 class="r">✏️ 確認テスト</h2>
+      <p>電気のきほん・半導体・部品・図記号・ブレッドボードから出題します（全${QUIZ.length}問）。答えるとすぐに解説が出ます。</p>
+      <p class="qlab">はんい</p><div class="qopts">${cats.map(([k,n,c])=>`<button type="button" data-act="cat" data-v="${k}" aria-pressed="${qs.cat===k}">${n} <small>${c}</small></button>`).join('')}</div>
+      <p class="qlab">問題の数</p><div class="qopts">${[[10,'10問'],[20,'20問'],['all','ぜんぶ']].map(([v,n])=>`<button type="button" data-act="n" data-v="${v}" aria-pressed="${String(qs.n)===String(v)}">${n}</button>`).join('')}</div>
+      <button class="qgo" type="button" data-act="start">スタート ▶</button>`;
+    return;
+  }
+  if(qs.phase==='q'){
+    const N=qs.list.length, q=qs.list[qs.i], done=qs.picked>=0, ok=done && q.ord[qs.picked]===0;
+    box.innerHTML=`<div class="qtop"><span class="qno">第${qs.i+1}問 / ${N}</span><span class="qcat">${QCAT[q.c]}</span></div>
+      <div class="qbar"><i style="width:${((qs.i+(done?1:0))/N*100).toFixed(1)}%"></i></div>
+      <p class="qq">${q.q}</p>${q.f?`<div class="qfig">${symSVG(q.f)}</div>`:''}
+      <div class="qch">${q.ord.map((o,k)=>{ const cls= !done?'' : o===0?'ok' : k===qs.picked?'ng':'';
+        return `<button type="button" data-act="pick" data-k="${k}" class="${cls}"${done?' disabled':''}><span class="k">${'ABCD'[k]}</span><span>${q.a[o]}</span></button>`; }).join('')}</div>
+      ${done?`<div class="qex ${ok?'ok':'ng'}"><b>${ok?'⭕ 正解！':`❌ ざんねん……正解は「${q.a[0]}」`}</b>${q.e}</div>
+      <button class="qgo" type="button" data-act="next">${qs.i===N-1?'結果を見る ▶':'次の問題へ ▶'}</button>`:''}`;
+    return;
+  }
+  const N=qs.list.length, r=qs.score/N;
+  const msg= r===1?'全問正解！ すばらしい！': r>=.8?'よくできました！ まちがえた問題の解説を読んでおこう。': r>=.5?'もう少し！ 「③しくみを知る」で復習しよう。':'まずは「③しくみを知る」を読んでから、もう一度ちょうせんしよう。';
+  box.innerHTML=`<h2 class="r">結果</h2><div class="qscore"><div class="big">${qs.score} / ${N}</div><p>${msg}</p></div>
+    ${qs.wrong.length?`<h3>まちがえた問題</h3><ul class="qwrong">${qs.wrong.map(q=>`<li><b>${q.q}</b>${q.f?'（図記号）':''}<br><span class="a">正解：${q.a[0]}</span><br>${q.e}</li>`).join('')}</ul>`:''}
+    <div class="qbtns"><button type="button" class="main" data-act="retry">もう一度（同じはんい）</button>${qs.wrong.length?'<button type="button" data-act="wrongonly">まちがえた問題だけ</button>':''}<button type="button" data-act="menu">はんいを選びなおす</button>${r<.8?'<button type="button" data-go="learn:current">③しくみを知るで復習</button>':''}</div>`;
+}
+$('#qBox').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='cat'){ qs.cat=b.dataset.v; renderQuiz(); }
+  else if(a==='n'){ qs.n= b.dataset.v==='all'?'all':+b.dataset.v; renderQuiz(); }
+  else if(a==='start'||a==='retry'){ quizStart(qPool()); }
+  else if(a==='wrongonly'){ const w=qs.wrong.map(q=>QUIZ.find(x=>x.q===q.q&&x.f===q.f&&x.a[0]===q.a[0])); qs.n='all'; quizStart(w); }
+  else if(a==='menu'){ qs.phase='start'; renderQuiz(); }
+  else if(a==='pick'){ if(qs.picked>=0) return; qs.picked=+b.dataset.k; const q=qs.list[qs.i];
+    if(q.ord[qs.picked]===0) qs.score++; else qs.wrong.push(q); renderQuiz(); }
+  else if(a==='next'){ if(qs.i<qs.list.length-1){ qs.i++; qs.picked=-1; } else qs.phase='end'; renderQuiz();
+    const t=$('#quizSec').getBoundingClientRect().top; if(t<0) $('#quizSec').scrollIntoView({block:'start'}); }
+});
+
+// ===== モードをまたぐリンク（data-go="basics:7" / "learn:ohm" / "quiz" / "navi"） =====
+function goTo(spec){
+  const [m,arg]=spec.split(':');
+  if(m==='basics' && arg){ const i=BASICS.findIndex(b=>String(b.n)===arg); if(i>=0) bStep=i; }
+  if(m==='learn' && arg) learnCh=arg;
+  if(m==='quiz' && qs.phase==='end') qs.phase='start';
+  topMode=m; view='full'; focusIdx=-1; hilite=[]; step=0; render();
+  $('.topmode').scrollIntoView({block:'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g){ e.preventDefault(); goTo(g.dataset.go); } });
+$('#lChips').addEventListener('click',e=>{ const c=e.target.closest('[data-ch]'); if(!c) return; learnCh=c.dataset.ch; render(); });
+$('#lPrev').addEventListener('click',()=>{ const i=LEARN.findIndex(c=>c.id===learnCh); if(i>0){ learnCh=LEARN[i-1].id; render(); $('#learnSec').scrollIntoView({block:'start'}); } });
+$('#lNext').addEventListener('click',()=>{ const i=LEARN.findIndex(c=>c.id===learnCh);
+  if(i<LEARN.length-1){ learnCh=LEARN[i+1].id; render(); $('#learnSec').scrollIntoView({block:'start'}); } else goTo('quiz'); });
+
+// ---- イベント ----
+document.querySelectorAll('[data-sensor]').forEach(b=>b.addEventListener('click',e=>{
+  if(e.target.closest('[data-lm]')) return;
+  const k=b.dataset.sensor; sel[k]=!sel[k];
+  const n=['light','person','sound','ir'].filter(x=>sel[x]).length;
+  if(n>2){ sel[k]=false; toast('センサーは2つまで選べます。先にどれかを外してください'); }
+  else if(sel.delay==='on' && momentary()){ sel.delay='off'; toast('音・赤外線はオフディレイだけなので、オフディレイに切りかえました'); }
+  step=0; focusIdx=-1; render();
+}));
+document.querySelectorAll('[data-lm]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); sel.lightMode=b.dataset.lm; sel.light=true; step=0; focusIdx=-1; render(); }));
+document.querySelectorAll('[data-out]').forEach(b=>b.addEventListener('click',()=>{ sel.out=b.dataset.out; step=0; focusIdx=-1; render(); }));
+document.querySelectorAll('[data-delay]').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.delay==='on' && momentary()){ toast('音・赤外線は一瞬しか反応しないので、オンディレイは選べません'); return; }
+  sel.delay=b.dataset.delay; step=0; focusIdx=-1; render(); }));
+document.querySelector('[data-sensor=light]').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ') && e.target===e.currentTarget){ e.preventDefault(); e.currentTarget.click(); } });
+document.addEventListener('keydown',e=>{ if(view!=='steps'||!current||e.target.closest('input,textarea')) return;
+  if(e.key==='ArrowRight'){ $('#nextBtn').click(); } else if(e.key==='ArrowLeft'){ $('#prevBtn').click(); } });
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{ view=b.dataset.view; focusIdx=-1; drawView(); }));
+$('#prevBtn').onclick=()=>{ if(step>0){step--; drawView();} };
+$('#nextBtn').onclick=()=>{ if(step<current.parts.length-1){step++; drawView();} else { view='try'; drawView(); } };
+$('#board').addEventListener('click',e=>{
+  if(view!=='full') return; const g=e.target.closest('.part'); focusIdx = g ? (+g.dataset.i===focusIdx?-1:+g.dataset.i) : -1; drawView();
+});
+$('#mute').onclick=()=>{ st.muted=!st.muted; $('#mute').setAttribute('aria-pressed',st.muted); $('#mute').textContent=st.muted?'音を出す':'音を消す'; };
+$('#zoom').onclick=()=>{ const on=$('.boardwrap').classList.toggle('zoomed'); $('#zoom').setAttribute('aria-pressed',on); $('#zoom').textContent=on?'元の大きさ':'大きく見る'; };
+let tt=null; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,2200); }
+
+
+
+document.querySelectorAll('[data-top]').forEach(b=>b.addEventListener('click',()=>{ topMode=b.dataset.top; focusIdx=-1; hilite=[]; view='full'; render(); }));
+$('#bPrev').addEventListener('click',()=>{ if(bStep>0){ bStep--; focusIdx=-1; render(); } });
+$('#bNext').addEventListener('click',()=>{ if(bStep<BASICS.length-1){ bStep++; focusIdx=-1; render(); } else { topMode='navi'; render(); $('#naviPick').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}); } });
+$('#bDots').addEventListener('click',e=>{ const d=e.target.closest('[data-bi]'); if(!d) return; bStep=+d.dataset.bi; focusIdx=-1; render(); });
+$('#cautionList').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.name){ e.preventDefault(); e.target.click(); } });
+$('#cautionList').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||!current) return;
+  const name=li.dataset.name;
+  hilite = current.parts.map((p,i)=>({p,i})).filter(x=>info(x.p).name===name).map(x=>x.i);
+  document.querySelectorAll('#cautionList li').forEach(x=>x.classList.toggle('sel', x===li));
+  if(view!=='full'){ view='full'; }
+  drawView();
+});
+
+/* ---- URLで最初の状態を指定できるようにする（紹介ページからの直リンク用） ----
+   ?s=light-dark,person  …… センサー（light-dark / light-bright / person / sound / ir）
+   ?out=led|mel          …… 動かすもの
+   ?d=off|on             …… 動き方
+   ?view=full|steps|try  …… 右側のタブ
+   ?step=12              …… 「組み立て手順」の何番目から見せるか
+   ?basics=7             …… 「きほんを学ぶ」のステップ番号
+   ?mode=basics|navi|learn|quiz …… 最初に開くモード（learn は &ch=ohm などで章も指定）
+   何も指定がなければ「①きほんを学ぶ」のステップ1から始まります。
+   s / out / d のどれかがあれば「②回路をえらぶ」で開きます。 */
+(function(){
+  const q=new URLSearchParams(location.search);
+  const s=q.get('s'), out=q.get('out'), d=q.get('d'), v=q.get('view'), bs=q.get('basics'), md=q.get('mode'), ch=q.get('ch');
+  topMode = (s||out||d) ? 'navi' : 'basics';
+  if(['basics','navi','learn','quiz'].includes(md)) topMode=md;
+  if(ch && LEARN.some(c=>c.id===ch)) learnCh=ch;
+  if(s) for(const k of s.split(',')){
+    if(k==='light-dark'){ sel.light=true; sel.lightMode='dark'; }
+    else if(k==='light-bright'){ sel.light=true; sel.lightMode='bright'; }
+    else if(k==='person'||k==='sound'||k==='ir'){ sel[k]=true; }
+  }
+  if(!['light','person','sound','ir'].some(k=>sel[k])) sel.light=true;
+  if(out==='led'||out==='mel') sel.out=out;
+  if(d==='off' || (d==='on' && !momentary())) sel.delay=d;
+  if(v==='full'||v==='steps'||v==='try') view=v;
+  const sp=+q.get('step'); if(sp>0) step=sp-1;
+  if(bs){ const i=BASICS.findIndex(b=>String(b.n)===bs); if(i>=0){ topMode='basics'; bStep=i; } }
+})();
+render(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>

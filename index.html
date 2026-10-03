@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TGT2Y7KLF3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TGT2Y7KLF3');
+  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回路ナビ | センサー回路のブレッドボード配線ナビゲーター</title>
+<meta name="description" content="センサーと動かすものを選ぶだけで、ブレッドボードの配線図が出てくる中学校技術科（エネルギー変換）向けの学習ツール。ステップごとの図解、電気のしくみ8章、確認テスト52問、参考作品の動画つき。Open EduTech Lab 無料公開。">
+<meta property="og:title" content="回路ナビ | センサー回路のブレッドボード配線ナビゲーター">
+<meta property="og:description" content="センサーと動かすものを選ぶだけで、ブレッドボードの配線図が出てくる。中学校 技術・家庭科（技術分野／エネルギー変換）向け。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="kairo-images/top2.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="kairo-images/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4F7FC;
+    --card:  #FFFFFF;
+    --ink:   #1B2335;
+    --soft:  #5B6579;
+    --line:  #DCE3EE;
+
+    --brand:      #2F6FE0;
+    --brand-deep: #1B4CA8;
+    --brand-tint: #E7EFFD;
+
+    --yellow:      #C98A00;
+    --yellow-tint: #FFF6CC;
+    --red:         #E8402F;
+    --red-tint:    #FFE9E6;
+    --green:       #1FA463;
+    --green-tint:  #E2F6EA;
+    --violet:      #7C4DF0;
+    --violet-tint: #F0E9FF;
+    --teal:        #0E8597;
+    --teal-tint:   #E0F5F8;
+    --orange:      #DB7407;
+    --orange-tint: #FFF0DD;
+
+    --round: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN",sans-serif;
+    --font:  "BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+    --shadow: 0 2px 8px rgba(27,35,53,.07), 0 16px 40px rgba(27,35,53,.09);
+    --radius: 20px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; }
+
+  /* ── 戻るリンクバー ── */
+  .nav-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244,247,252,.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 0 20px;
+  }
+  .nav-bar .inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; height: 54px; gap: 10px;
+  }
+  .nav-logo {
+    font-family: var(--round); font-weight: 800; font-size: 17px;
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--ink);
+  }
+  .nav-logo img { width: 24px; height: 24px; border-radius: 6px; }
+  .nav-open {
+    margin-left: auto; text-decoration: none;
+    background: var(--brand); color: #fff;
+    font-weight: 700; font-size: .82rem;
+    padding: 7px 16px; border-radius: 999px; white-space: nowrap;
+  }
+  .nav-open:hover { background: var(--brand-deep); }
+
+  /* ── ヘッダー（TOP画像） ── */
+  header { display: block; line-height: 0; padding-top: 32px; background: var(--paper); }
+  header img {
+    width: 90%; max-width: 1000px; height: auto;
+    display: block; margin: 0 auto; border-radius: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ── メイン ── */
+  main { max-width: 900px; margin: 0 auto 60px; padding: 0 16px; }
+
+  /* ── セクション見出し ── */
+  .section-label {
+    font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+    color: var(--soft); text-transform: uppercase; margin: 52px 0 18px 4px;
+  }
+  .section-title {
+    font-family: var(--round); font-size: 1.4rem; font-weight: 800;
+    color: var(--ink); margin-bottom: 6px; line-height: 1.4;
+  }
+  .section-desc { font-size: .88rem; color: var(--soft); margin-bottom: 22px; line-height: 1.8; }
+
+  /* ── アプリを開く ── */
+  .demo-box { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .demo-box-banner {
+    background: linear-gradient(135deg, #FFD21A, #F7A400);
+    color: #3E3510; padding: 28px 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .demo-box-banner .left { display: flex; flex-direction: column; gap: 8px; }
+  .demo-box-banner .badge-demo {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.55); color: #5A4A00;
+    font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; width: fit-content;
+  }
+  .demo-box-banner h3 { font-family: var(--round); font-size: 1.3rem; font-weight: 800; }
+  .demo-box-banner p  { font-size: .85rem; max-width: 46ch; line-height: 1.8; }
+  .demo-box-banner .btn-try {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1B2335; color: #FFD21A;
+    font-family: var(--round); font-weight: 800; font-size: .95rem;
+    padding: 14px 30px; border-radius: 14px;
+    text-decoration: none; transition: all .2s; flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  }
+  .demo-box-banner .btn-try:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.24); }
+  .demo-features { padding: 20px 24px; display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); }
+  .demo-feat-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--brand-tint); color: var(--brand-deep);
+    font-size: .75rem; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+  }
+
+  /* ── 機能ブロック ── */
+  .feature-block {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    border: 1.5px solid var(--line); overflow: hidden; margin-bottom: 28px; position: relative;
+  }
+  .feature-block::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px; background: var(--accent, var(--brand));
+  }
+  .feature-block-head { padding: 28px 28px 0; display: flex; align-items: flex-start; gap: 16px; }
+  .fb-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0;
+  }
+  .fb-meta { flex: 1; min-width: 0; }
+  .fb-number { font-size: .72rem; font-weight: 700; letter-spacing: .1em; color: var(--accent, var(--brand)); margin-bottom: 3px; }
+  .fb-title { font-family: var(--round); font-size: 1.2rem; font-weight: 800; line-height: 1.35; margin-bottom: 6px; }
+  .fb-tag { display: inline-block; font-size: .7rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .fb-img, .fb-img-hero {
+    margin: 20px 28px 0; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); background: var(--paper); line-height: 0;
+  }
+  .fb-img-hero { border-width: 1.5px; border-radius: 14px; box-shadow: 0 4px 24px rgba(27,35,53,.10); }
+  .fb-img img, .fb-img-hero img { width: 100%; display: block; }
+  .fb-desc { padding: 18px 28px 0; font-size: .88rem; color: var(--soft); line-height: 1.9; }
+  .fb-points {
+    margin: 16px 28px 0; display: flex; flex-direction: column;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  }
+  .fb-point {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 16px; border-bottom: 1px solid var(--line); font-size: .855rem; line-height: 1.7;
+  }
+  .fb-point:last-child { border-bottom: none; }
+  .fb-point .pt-icon { flex-shrink: 0; font-size: 16px; margin-top: 2px; }
+  .fb-point .pt-body { flex: 1; min-width: 0; }
+  .fb-point .pt-body strong { display: block; font-size: .87rem; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+  .fb-point .pt-body span { color: var(--soft); }
+  .feature-block-foot { padding: 20px 28px 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .fb-sub-imgs { margin: 14px 28px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; align-items: start; }
+  .fb-sub-img { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--paper); }
+  .fb-sub-img img { width: 100%; display: block; }
+  .fb-sub-label { padding: 8px 12px; font-size: .76rem; font-weight: 700; color: var(--soft); border-top: 1px solid var(--line); text-align: center; }
+  .fb-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .82rem; font-weight: 700; text-decoration: none;
+    color: var(--accent, var(--brand));
+    border: 1.5px solid currentColor; border-radius: 999px; padding: 6px 16px;
+  }
+  .fb-link:hover { background: var(--accent-tint, var(--brand-tint)); }
+
+  /* ── 参考作品 ── */
+  .works { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+  .work {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 18px;
+    overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;
+  }
+  .work-head { padding: 16px 18px 12px; display: flex; gap: 12px; align-items: flex-start; }
+  .work-no {
+    font-family: var(--round); font-weight: 800; font-size: 1.05rem;
+    width: 34px; height: 34px; flex: none; border-radius: 10px;
+    display: grid; place-items: center; background: var(--brand-tint); color: var(--brand-deep);
+  }
+  .work-head h3 { font-size: .93rem; font-weight: 700; line-height: 1.6; }
+  .work-video { background: #000; aspect-ratio: 16 / 9; }
+  .work-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .work-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .work-set { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+    background: var(--paper); color: var(--soft); border: 1px solid var(--line);
+  }
+  .chip.s { background: var(--yellow-tint); color: #7A5B00; border-color: #F0DC9A; }
+  .chip.o { background: var(--violet-tint); color: #5B2FBF; border-color: #D8C9FA; }
+  .chip.d { background: var(--teal-tint); color: #0A6B7A; border-color: #A9DFE7; }
+  .work-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+  .work-links a {
+    font-size: .78rem; font-weight: 700; text-decoration: none;
+    padding: 7px 14px; border-radius: 999px; white-space: nowrap;
+  }
+  .wl-open { background: var(--brand); color: #fff; }
+  .wl-open:hover { background: var(--brand-deep); }
+  .wl-pdf { background: var(--card); color: var(--soft); border: 1.5px solid var(--line); }
+  .wl-pdf:hover { border-color: var(--brand); color: var(--brand); }
+  .source-note {
+    margin-top: 18px; font-size: .8rem; color: var(--soft); line-height: 1.8;
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--orange);
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .source-note a { color: var(--brand); }
+
+  /* ── スペック表 ── */
+  .spec-table { width: 100%; border-collapse: collapse; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .spec-table thead th {
+    background: var(--brand-tint); color: var(--brand-deep);
+    font-size: .8rem; font-weight: 700; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line);
+  }
+  .spec-table tbody tr { border-bottom: 1px solid var(--line); background: var(--card); }
+  .spec-table tbody tr:last-child { border-bottom: none; }
+  .spec-table tbody td { padding: 12px 16px; font-size: .86rem; }
+  .spec-table tbody td:first-child { font-weight: 700; color: var(--soft); width: 150px; background: var(--paper); }
+
+  /* ── 規約セクション ── */
+  .notice-section { background: var(--brand-tint); padding: 52px 20px; margin-top: 60px; }
+  .notice-section .inner { max-width: 900px; margin: 0 auto; }
+  .notice-dl { display: flex; flex-direction: column; gap: 14px; font-size: .88rem; line-height: 1.85; }
+  .notice-row { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: baseline; }
+  .notice-dt { font-weight: 700; color: var(--brand-deep); white-space: nowrap; }
+  .notice-dd { color: var(--soft); }
+
+  /* ── フッター ── */
+  footer { text-align: center; padding: 32px 16px 52px; font-size: .8rem; color: var(--soft); border-top: 1px solid var(--line); }
+  footer a { color: var(--soft); }
+
+  @media (max-width: 560px) {
+    .demo-box-banner { flex-direction: column; align-items: stretch; padding: 24px 20px; }
+    .demo-box-banner .btn-try { justify-content: center; }
+    .feature-block-head, .fb-desc, .feature-block-foot { padding-left: 18px; padding-right: 18px; }
+    .fb-img, .fb-img-hero, .fb-points, .fb-sub-imgs { margin-left: 18px; margin-right: 18px; }
+    .notice-row { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<!-- ナビバー -->
+<div class="nav-bar">
+  <div class="inner">
+    <a class="nav-logo" href="index.html">
+      <img src="kairo-images/favicon.png" alt="">
+      回路ナビ
+    </a>
+    <a class="nav-open" href="kairo-navi.html" target="_blank" rel="noopener noreferrer">回路ナビを開く →</a>
+  </div>
+</div>
+
+<!-- ヘッダー（TOP画像） -->
+<header>
+  <img src="kairo-images/top.png" alt="回路ナビ — センサーと動かすものをえらぶと、ブレッドボードの配線図が出てくる">
+</header>
+
+<!-- ── アプリを開く ── -->
+<div style="background:var(--paper);padding:32px 0 0;">
+  <div style="width:90%;max-width:1000px;margin:0 auto;">
+    <div class="demo-box">
+      <div class="demo-box-banner">
+        <div class="left">
+          <span class="badge-demo">🔌 ブラウザですぐ使えます</span>
+          <h3>回路ナビを開く</h3>
+          <p>インストールも登録も不要。LED1個から順に学べる「きほん」、センサーと動きを選ぶと配線図が出る「回路をえらぶ」、電気のしくみの解説、確認テストまで、ひとつの画面で使えます。生徒のタブレット・スマートフォンでもそのまま動きます。</p>
+        </div>
+        <a href="kairo-navi.html" class="btn-try" target="_blank" rel="noopener noreferrer">💡 回路ナビを開く →</a>
+      </div>
+      <div class="demo-features">
+        <span class="demo-feat-pill">☀️ 明るさ（CdS）</span>
+        <span class="demo-feat-pill">🚶 人感センサー</span>
+        <span class="demo-feat-pill">🎤 マイク（音）</span>
+        <span class="demo-feat-pill">📡 赤外線</span>
+        <span class="demo-feat-pill">💡 LED</span>
+        <span class="demo-feat-pill">🎵 メロディ</span>
+        <span class="demo-feat-pill">⏱ オン／オフディレイ</span>
+        <span class="demo-feat-pill">🧰 34通りの配線図</span>
+        <span class="demo-feat-pill">📘 ステップごとの図解</span>
+        <span class="demo-feat-pill">📖 しくみを知る（8章）</span>
+        <span class="demo-feat-pill">✏️ 確認テスト（52問）</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── 概要 ── -->
+  <p class="section-label">About</p>
+  <p class="section-title">「配線図が読めない」で止まらない授業へ</p>
+  <p class="section-desc">
+    中学校 技術・家庭科（技術分野）のエネルギー変換では、センサーを使った回路づくりに取り組みます。ところが、プリントの配置図とブレッドボードを見くらべる作業でつまずく生徒は少なくありません。<br>
+    回路ナビは、<strong>「なにに反応させる？」「なにを動かす？」「動き方は？」の3つを選ぶだけ</strong>で、その場でブレッドボードの配線図を描き出します。完成図だけでなく、1本ずつの組み立て手順、部品の向きの注意、画面の中での動作確認まで、同じ画面でひと続きに扱えます。<br>
+    さらに、電流・電圧・半導体・電子用図記号・回路図の読み方を図で学べる<strong>「しくみを知る」</strong>と、52問の<strong>「確認テスト」</strong>も入っているので、<strong>知識の習得 → 製作 → ふりかえり</strong>までを1つのツールで扱えます。<br>
+    回路データは、授業で実際に配布しているプリントの配置図をもとにしています。
+  </p>
+
+  <!-- ── 機能詳細 ── -->
+  <p class="section-label">機能一覧</p>
+  <p class="section-title">学ぶ → えらぶ → 組み立てる → ためす → ふりかえる</p>
+  <p class="section-desc">画面の上の4つのボタンで、<strong>①きほんを学ぶ ／ ②回路をえらぶ ／ ③しくみを知る ／ ④確認テスト</strong> を切りかえます。開くと①きほんを学ぶのステップ1から始まります。</p>
+
+  <!-- 01 きほんを学ぶ -->
+  <div class="feature-block" style="--accent:var(--teal); --accent-tint:var(--teal-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--teal-tint)">🪜</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 01</div>
+        <div class="fb-title">きほんを学ぶ（11ステップ）</div>
+        <span class="fb-tag" style="background:var(--teal-tint);color:var(--teal)">生徒向け · 導入 · 段階学習</span>
+      </div>
+    </div>
+    <div class="fb-img">
+      <img src="kairo-images/feature-basics.png" alt="きほんを学ぶモードのステップ7。トランジスタ・CdSの図と回路図つきの解説カード" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      いきなりセンサー回路に入らず、LED1個を光らせるところから順番に積み上げるモードです。直列・並列 → 抵抗器 → 半固定ボリューム → センサー＋トランジスタ → メロディIC → ディレイ回路と、11ステップでセンサー回路のしくみにたどりつきます。<br>
+      ステップごとに<strong>「このステップの解説」</strong>が付いていて、部品のイラスト（足の向き・カラーコード）、<strong>電子用図記号で描いた回路図</strong>、動きのグラフを見ながら、なぜそうつなぐのかを確かめられます。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">💡</span><div class="pt-body"><strong>ステップ1〜4：LEDと直列・並列</strong><span>LED1個を光らせたあと、「2個にするには？」──1本道（直列）につなぐと電圧が足りず光らないことを確かめ、道を分ける並列で2個 → 4個とふやしていきます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🎚️</span><div class="pt-body"><strong>ステップ5〜6：抵抗器と半固定ボリューム</strong><span>固定抵抗を入れる意味、つまみで抵抗を変える半固定ボリュームのはたらきを扱います。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🌙</span><div class="pt-body"><strong>ステップ7〜9：センサー＋トランジスタ</strong><span>「トランジスタは小さな電気で大きな電気を切りかえるスイッチ」。CdSで暗さに反応する回路、感度調整、人感センサーへと進みます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">⏱️</span><div class="pt-body"><strong>ステップ10〜11：メロディICとディレイ回路</strong><span>コンデンサが「じわっと鳴りはじめる・じわっと消える」をつくるしくみを、オンディレイ・オフディレイの2つの回路で確かめます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📘</span><div class="pt-body"><strong>どのステップにも図つきの解説</strong><span>LED・抵抗器・トランジスタ・CdS・人感センサー・コンデンサなどの部品図と回路図を、ステップの内容に合わせて表示。「もっとくわしく」から③しくみを知るの該当する章へ移れます。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?basics=7" target="_blank" rel="noopener noreferrer">ステップ7を開いてみる →</a>
+    </div>
+  </div>
+
+  <!-- 02 回路をえらぶ -->
+  <div class="feature-block" style="--accent:var(--red); --accent-tint:var(--red-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--red-tint)">🎛️</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 02</div>
+        <div class="fb-title">センサーと動きをえらぶ</div>
+        <span class="fb-tag" style="background:var(--red-tint);color:var(--red)">生徒向け · 設計 · 34通り</span>
+      </div>
+    </div>
+    <div class="fb-img">
+      <img src="kairo-images/feature-select.png" alt="センサー・動かすもの・動き方を選ぶカードUI" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      ①なにに反応させる？（明るさ・人・音・赤外線から2つまで）②なにを動かす？（LED／メロディ）③動き方は？（オフディレイ／オンディレイ）── この3つを選ぶだけで回路が決まります（URLに <code>?s=</code> などを付けて開くと、このモードから始まります）。センサーの組み合わせ17通り × LED／メロディの2通りで、34の配線図を収録しています。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">☀️</span><div class="pt-body"><strong>明るさは「暗いとき／明るいとき」を切りかえ</strong><span>CdSを使った回路は、どちらで反応させるかをカードの中で選べます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📈</span><div class="pt-body"><strong>オン／オフディレイをグラフで示す</strong><span>「すぐ動いて、ゆっくり止まる」「ゆっくり動きだし、ゆっくり止まる」のちがいを、言葉と波形の両方で表示します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🚫</span><div class="pt-body"><strong>できない組み合わせは理由を説明</strong><span>「音＋赤外線」や、音・赤外線でのオンディレイなど、実際には動かない選択は、なぜ動かないのかを文章で返します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔗</span><div class="pt-body"><strong>URLで直接ひらける</strong><span><code>?s=person,light-dark&amp;out=led&amp;d=off</code> のように指定すると、その回路を開いた状態でリンクを配れます。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?s=sound&out=led&d=off" target="_blank" rel="noopener noreferrer">「音→LED」を開いてみる →</a>
+    </div>
+  </div>
+
+  <!-- 03 完成図 -->
+  <div class="feature-block" style="--accent:var(--brand); --accent-tint:var(--brand-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--brand-tint)">🧩</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 03</div>
+        <div class="fb-title">ブレッドボードの完成図</div>
+        <span class="fb-tag" style="background:var(--brand-tint);color:var(--brand)">生徒・教師向け · 配線図 · SVG</span>
+      </div>
+    </div>
+    <div class="fb-img-hero">
+      <img src="kairo-images/feature-board.png" alt="ブレッドボードの完成配線図と「使う部品」一覧" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      実物のブレッドボードと同じ穴の並び（X・A〜J・Y列）で、ジャンパー線・抵抗器・トランジスタ・センサーの位置をそのまま描き出します。抵抗器はカラーコードの帯まで色分けしてあるので、図と実物を見くらべながら部品を選べます。部品をタップすると、その部品のはたらきと、さしこむ穴の位置が表示されます。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">🎨</span><div class="pt-body"><strong>抵抗器はカラーコードで表示</strong><span>10kΩ（茶・黒・橙）、22kΩ（赤・赤・橙）など、帯の色をそのまま描いています。「使う部品」一覧にも色の並びを併記。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">👆</span><div class="pt-body"><strong>部品をタップすると役わりがわかる</strong><span>「トランジスタ＝小さな電気で大きな電気を切りかえるスイッチ」のように、その部品が何をしているかを1つずつ説明します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔍</span><div class="pt-body"><strong>「大きく見る」で拡大</strong><span>スマートフォンの小さな画面でも、ボードを拡大して穴の位置を確かめられます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📝</span><div class="pt-body"><strong>先生用メモ</strong><span>その配線図がプリントの配置図そのままなのか、LEDとメロディを入れかえたものなのか、新しく設計したものなのかを明記しています。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?s=person,light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">この回路を開いてみる →</a>
+    </div>
+  </div>
+
+  <!-- 04 組み立て手順 -->
+  <div class="feature-block" style="--accent:var(--orange); --accent-tint:var(--orange-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--orange-tint)">🪛</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 04</div>
+        <div class="fb-title">組み立て手順（1本ずつ）</div>
+        <span class="fb-tag" style="background:var(--orange-tint);color:var(--orange)">生徒向け · 製作 · 進度の可視化</span>
+      </div>
+    </div>
+    <div class="fb-img-hero">
+      <img src="kairo-images/feature-steps.png" alt="組み立て手順モード。13/20ステップ目の人感センサーが光って表示されている" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      完成図をいきなり写すのではなく、「X-3 と A-3 をつなぐ」「V+ を C-3、Vo を D-4、V− を C-5 に差す」のように、1部品ずつ順番に示します。これから差す部品は光って示され、差し終わった部品はうすく残るので、どこまで進んだかが一目でわかります。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">🔢</span><div class="pt-body"><strong>穴の番号で指示</strong><span>行（X・A〜J・Y）と列（1〜23）の番号で位置を言葉にするので、実物のボードと照らし合わせやすくなります。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">✨</span><div class="pt-body"><strong>いま差す部品が光る</strong><span>該当する穴にリングが表示され、済んだ部品は淡色で残ります。作業の中断・再開がしやすい設計です。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📊</span><div class="pt-body"><strong>進捗バーで残りがわかる</strong><span>「13 / 20」のように、全体のどこにいるかを常に表示します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">⌨️</span><div class="pt-body"><strong>矢印キーで進める</strong><span>パソコンでは ← → キーで手順を送れるので、手を動かしながら操作できます。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?s=person&out=mel&d=on&view=steps" target="_blank" rel="noopener noreferrer">組み立て手順を見てみる →</a>
+    </div>
+  </div>
+
+  <!-- 05 ためしてみる -->
+  <div class="feature-block" style="--accent:var(--violet); --accent-tint:var(--violet-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--violet-tint)">🧪</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 05</div>
+        <div class="fb-title">ためしてみる（動作シミュレーション）</div>
+        <span class="fb-tag" style="background:var(--violet-tint);color:var(--violet)">生徒向け · 動作確認 · 音あり</span>
+      </div>
+    </div>
+    <div class="fb-img-hero">
+      <img src="kairo-images/feature-try.png" alt="ためしてみるモード。まわりの明るさを切りかえてLEDの光り方を確かめる画面" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      部品がそろう前でも、画面の中で回路の動きを確かめられます。「まわりを暗くする」「音を出す」「人がいる状態にする」などを切りかえると、ボード上のLEDが光り、メロディの回路ならスピーカーから実際に音が鳴ります。オフディレイならじわっと消え、オンディレイならじわっと鳴りはじめる──時間の変化がそのまま目と耳でわかります。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">🌗</span><div class="pt-body"><strong>センサーの状態を切りかえ</strong><span>選んだセンサーに応じて、明るさ・人の有無・音・赤外線のボタンが出ます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔊</span><div class="pt-body"><strong>メロディは実際に音が出る</strong><span>Web Audio でメロディICの音を再現します。教室で使うときのために「音を消す」ボタンも用意しています。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📶</span><div class="pt-body"><strong>メーターで変化を見る</strong><span>コンデンサにたまった電気の量をバーで表示。「なぜゆっくりなのか」を数の変化として見られます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔁</span><div class="pt-body"><strong>リセットボタンも再現</strong><span>押しボタンスイッチを押してコンデンサの電気を逃がす動きも、画面上で試せます。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?s=light-dark&out=led&d=off&view=try" target="_blank" rel="noopener noreferrer">動かしてみる →</a>
+    </div>
+  </div>
+
+  <!-- 06 部品の向き -->
+  <div class="feature-block" style="--accent:var(--green); --accent-tint:var(--green-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--green-tint)">⚠️</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 06</div>
+        <div class="fb-title">向きに気をつける部品 ＋ 部品リスト</div>
+        <span class="fb-tag" style="background:var(--green-tint);color:var(--green)">生徒・教師向け · 事故防止 · 準備</span>
+      </div>
+    </div>
+    <div class="fb-img">
+      <img src="kairo-images/feature-caution.png" alt="「向きに気をつける部品」の一覧と、右側の「使う部品」リスト" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      極性のある部品だけを自動で抜き出して、回路ごとに注意書きを出します。コンデンサの逆差し、トランジスタの向き、人感センサーの3本足の役わりなど、こわれる・動かない原因になりやすいところを先に伝えます。項目をタップすると、その部品がボードのどこにあるかが光ってわかります。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">🔋</span><div class="pt-body"><strong>コンデンサ・LEDの極性</strong><span>＋（長い足）と−（短い足）。逆に差すとこわれる／光らないことを明示します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔺</span><div class="pt-body"><strong>トランジスタ・メロディICの向き</strong><span>平らな面・丸い面の向きと、3本の足（E・C・B）の並びを注意します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">📋</span><div class="pt-body"><strong>「使う部品」を個数つきで表示</strong><span>ジャンパー線19本、抵抗10kΩ×3 …… のように、その回路に必要な部品と個数が一覧になります。部品の準備や片づけの確認に使えます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">💡</span><div class="pt-body"><strong>タップでボード上を光らせる</strong><span>「人感センサー」をタップすると、ボードのどこに差すのかがその場で光ります。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?s=person&out=mel&d=on" target="_blank" rel="noopener noreferrer">注意表示を見てみる →</a>
+    </div>
+  </div>
+
+  <!-- 07 しくみを知る -->
+  <div class="feature-block" style="--accent:var(--violet); --accent-tint:var(--violet-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--violet-tint)">📖</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 07</div>
+        <div class="fb-title">しくみを知る（8章）</div>
+        <span class="fb-tag" style="background:var(--violet-tint);color:var(--violet)">生徒向け · 知識 · 図解</span>
+      </div>
+    </div>
+    <div class="fb-img-hero">
+      <img src="kairo-images/feature-learn.png" alt="回路図の読み方の章。回路図とブレッドボードの実体配線図を並べて見くらべる" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      配線の前に知っておきたい電気の知識を、8つの章にまとめました。水のたとえ、電子用図記号の一覧、回路図と実体配線図の見くらべなど、<strong>図を中心に</strong>説明しています。「回路図の読み方」では、ステップ7の回路図とブレッドボードを並べて、「回路図の●がブレッドボードのどの穴にあたるか」を確かめられます。
+    </div>
+    <div class="fb-sub-imgs">
+      <div class="fb-sub-img"><img src="kairo-images/feature-learn-sym.png" alt="電子用図記号の一覧" loading="lazy"><div class="fb-sub-label">電子用図記号（JIS）16種</div></div>
+      <div class="fb-sub-img"><img src="kairo-images/feature-learn-ohm.png" alt="オームの法則の章とスライダーで動く計算機" loading="lazy"><div class="fb-sub-label">オームの法則 ─ スライダーで計算</div></div>
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">💧</span><div class="pt-body"><strong>1. 電流・電圧・抵抗 ／ 2. オームの法則 ／ 3. 直列と並列</strong><span>水のたとえ図で量のイメージをつかみ、電圧と抵抗をスライダーで動かして電流を計算。直列と並列は表で比べます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">💎</span><div class="pt-body"><strong>4. 半導体 ／ 5. いろいろな部品</strong><span>導体・半導体・絶縁体、ダイオードの一方通行、LED、トランジスタのスイッチ作用・増幅作用。抵抗のカラーコード、CdS、コンデンサ、センサーのはたらき。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔣</span><div class="pt-body"><strong>6. 電子用図記号 ／ 7. 回路図の読み方</strong><span>JIS の記号16種を一覧に。回路図のルール（●は接続、電池は長い線が＋ など）と、回路図・実体配線図の対応。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔌</span><div class="pt-body"><strong>8. ブレッドボードのしくみ</strong><span>どの穴どうしが中でつながっているかを色分けで表示。「同じグループに両足をさすと部品がはたらかない」といったつまずきも先回りして説明します。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?mode=learn&ch=current" target="_blank" rel="noopener noreferrer">しくみを知るを開く →</a>
+      <a class="fb-link" href="kairo-navi.html?mode=learn&ch=schematic" target="_blank" rel="noopener noreferrer">回路図の読み方を開く →</a>
+    </div>
+  </div>
+
+  <!-- 08 確認テスト -->
+  <div class="feature-block" style="--accent:var(--orange); --accent-tint:var(--orange-tint)">
+    <div class="feature-block-head">
+      <div class="fb-icon" style="background:var(--orange-tint)">✏️</div>
+      <div class="fb-meta">
+        <div class="fb-number">FEATURE 08</div>
+        <div class="fb-title">確認テスト（52問）</div>
+        <span class="fb-tag" style="background:var(--orange-tint);color:var(--orange)">生徒向け · ふりかえり · 即時フィードバック</span>
+      </div>
+    </div>
+    <div class="fb-img">
+      <img src="kairo-images/feature-quiz.png" alt="確認テスト。電子用図記号を見て名前を答える問題と、正解の解説" loading="lazy">
+    </div>
+    <div class="fb-desc">
+      電気の基礎・半導体・部品・図記号と回路図・ブレッドボードと動き方の5つのはんいから、4択で出題します。答えるとすぐに正解と解説が出るので、まちがえたその場で理解をなおせます。図記号の問題は記号の図を見て答えます。
+    </div>
+    <div class="fb-points">
+      <div class="fb-point"><span class="pt-icon">🎯</span><div class="pt-body"><strong>はんいと問題数を選べる</strong><span>「すべて」か5つのはんいから選び、10問・20問・ぜんぶで出題。問題の順番と選択肢の並びは毎回入れかわります。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">💬</span><div class="pt-body"><strong>1問ごとに解説</strong><span>「オームの法則より 3 ÷ 100 ＝ 0.03A」のように、なぜその答えになるのかを毎回表示します。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔁</span><div class="pt-body"><strong>まちがえた問題だけやり直し</strong><span>結果画面で、まちがえた問題と解説を一覧表示。「まちがえた問題だけ」でもう一度ちょうせんできます。得点が低いときは③しくみを知るへの案内も出ます。</span></div></div>
+      <div class="fb-point"><span class="pt-icon">🔒</span><div class="pt-body"><strong>記録は残しません</strong><span>得点や解答はどこにも送信・保存しません。授業のふりかえりや家庭学習で気軽に使えます。</span></div></div>
+    </div>
+    <div class="feature-block-foot">
+      <a class="fb-link" href="kairo-navi.html?mode=quiz" target="_blank" rel="noopener noreferrer">確認テストを開く →</a>
+    </div>
+  </div>
+
+  <!-- ── 参考作品 ── -->
+  <p class="section-label">参考作品</p>
+  <p class="section-title">実際に作った7つの回路（動画）</p>
+  <p class="section-desc">
+    授業で製作した参考作品です。動画で動きを確かめてから、同じ回路を回路ナビで開いて配線を確認できます。「回路ナビで開く」を押すと、その作品と同じ設定（センサー・動かすもの・動き方）が選ばれた状態で開きます。
+  </p>
+
+  <div class="works">
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">1</span><h3>暗くなるとLEDが点灯し、明るくなると徐々に消灯する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/1GduxcoU-z7Si5NeRH2wJ8pbpDg2kWek3/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品1の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/15-P9mCGKZSh2rlMEHC4xaLUBa1PNbKF4/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">2</span><h3>人がいて、明るいと徐々にメロディが流れ出す。人がいない、または暗いと徐々に消音する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/1B48ix8vOC0jg3pIIlI12wruz5WrZSnTs/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品2の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">🚶 人</span><span class="chip s">☀️ 明るさ（明るいとき）</span><span class="chip o">🎵 メロディ</span><span class="chip d">⏱ オンディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=person,light-bright&out=mel&d=on" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/14uFh_4E0L9l3jTFDlMGTL9Xcf0sacsqX/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">3</span><h3>音がするとLEDが点灯し、音がなくなると徐々に消灯する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/1EJd6pAf86YOqPLwlMNGLiqo8ANJHkyZA/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品3の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">🎤 音</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=sound&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/1pa1DIA5_T5CmgXAEzrvGSSKW49sXYf6G/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">4</span><h3>赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/10Gxipv7D8EBRugLpagbmQhS9Z-2YJC5R/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品4の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">📡 赤外線</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=ir&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/1qXH6JX7sL8znfXEMmbi3M3C4FkK7u82B/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">5</span><h3>人がいて、暗いとLEDが点灯し、人がいないまたは明るいと徐々に消灯する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/1UnogKCYvF-vTVxHJlK4OzxUquO2DaQEH/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品5の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">🚶 人</span><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=person,light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/1SJI0ckWvTVt0CXFNwSxJhXmopv_xmbjV/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">6</span><h3>暗くて、音がするとLEDが点灯し、明るいまたは音がしないと徐々に消灯する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/13zJKDjhzcDpAuN2uAouHkN6OTG1-kW_u/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品6の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">🎤 音</span><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=sound,light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/18YjwwQKuZ7VnB_A1wP8YnwuGe_ThUQe5/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="work-head"><span class="work-no">7</span><h3>人がいると徐々にメロディが流れ出す。人がいないと、徐々に消音する。</h3></div>
+      <div class="work-video"><iframe src="https://drive.google.com/file/d/1bxHN67xhjBhJBsW1m_hEykAVpTdfudZ7/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品7の動画"></iframe></div>
+      <div class="work-body">
+        <div class="work-set"><span class="chip s">🚶 人</span><span class="chip o">🎵 メロディ</span><span class="chip d">⏱ オンディレイ</span></div>
+        <div class="work-links">
+          <a class="wl-open" href="kairo-navi.html?s=person&out=mel&d=on" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
+          <a class="wl-pdf" href="https://drive.google.com/file/d/1-fTto06tFv0wO1IycvGtGPfsNhKFApK0/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="source-note">
+    動画・回路図は、授業用に公開している Google サイト
+    <a href="https://sites.google.com/iizuna.ed.jp/kairo/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener noreferrer">「【参考作品】回路」</a>
+    の内容を引用しています。Google ドライブ上のファイルのため、共有設定によっては動画・PDFの表示にログインが必要になる場合があります。その場合でも、回路ナビ本体はそのまま利用できます。
+  </p>
+
+  <!-- ── 授業での使い方 ── -->
+  <p class="section-label">授業での使い方</p>
+  <p class="section-title">こんな場面で使えます</p>
+  <div class="fb-points" style="margin:0">
+    <div class="fb-point"><span class="pt-icon">1️⃣</span><div class="pt-body"><strong>導入：電気のしくみとセンサー回路を知る</strong><span>「③しくみを知る」で電流・電圧・図記号を確認したあと、「①きほんを学ぶ」を全体提示で1〜11まで送りながら、LED → 抵抗 → トランジスタ → コンデンサの順に、ステップごとの図解を使って説明します。</span></div></div>
+    <div class="fb-point"><span class="pt-icon">2️⃣</span><div class="pt-body"><strong>構想：どんな作品にするか決める</strong><span>参考作品の動画を見て、自分の作品の「反応するもの」と「動くもの」を決めます。「回路をえらぶ」で候補を試しながら決められます。</span></div></div>
+    <div class="fb-point"><span class="pt-icon">3️⃣</span><div class="pt-body"><strong>製作：手元で配線を確認しながら進める</strong><span>生徒の端末で「組み立て手順」を開き、1本ずつ確認しながらブレッドボードに差していきます。教師は机間指導に専念できます。</span></div></div>
+    <div class="fb-point"><span class="pt-icon">4️⃣</span><div class="pt-body"><strong>検証：動かないときの原因さがし</strong><span>「向きに気をつける部品」と「ためしてみる」を使って、配線ミスか部品の向きかを切り分けます。</span></div></div>
+    <div class="fb-point"><span class="pt-icon">5️⃣</span><div class="pt-body"><strong>まとめ：確認テストでふりかえる</strong><span>単元の終わりに「④確認テスト」。まちがえた問題の解説を読み、「まちがえた問題だけ」でやり直します。</span></div></div>
+    <div class="fb-point"><span class="pt-icon">🏠</span><div class="pt-body"><strong>家庭学習・欠席時のフォロー</strong><span>URLひとつで同じ画面が開くので、欠席した生徒にその回路や章のリンクを渡すだけで追いつけます。</span></div></div>
+  </div>
+
+  <!-- ── 技術仕様 ── -->
+  <p class="section-label">技術仕様</p>
+  <table class="spec-table">
+    <thead>
+      <tr><th>項目</th><th>内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>構成</td><td>HTML / CSS / JavaScript（フレームワーク不使用・1ファイル完結）</td></tr>
+      <tr><td>配線図</td><td>SVGで動的生成（部品の位置データから毎回描画）</td></tr>
+      <tr><td>収録回路</td><td>センサーの組み合わせ17通り × LED／メロディ ＝ 34の配線図</td></tr>
+      <tr><td>モード</td><td>①きほんを学ぶ ／ ②回路をえらぶ ／ ③しくみを知る ／ ④確認テスト（開くと①から始まります）</td></tr>
+      <tr><td>きほんのステップ</td><td>11ステップ（12画面）・すべてに図つきの解説</td></tr>
+      <tr><td>しくみを知る</td><td>8章（電流・電圧・抵抗／オームの法則／直列と並列／半導体／いろいろな部品／電子用図記号／回路図の読み方／ブレッドボードのしくみ）</td></tr>
+      <tr><td>確認テスト</td><td>4択52問（5つのはんい）・1問ごとに解説・まちがえた問題のやり直し</td></tr>
+      <tr><td>図</td><td>回路図・部品図・グラフはすべてSVGで描画。電子用図記号は JIS C 0617 の形</td></tr>
+      <tr><td>対応センサー</td><td>CdS（光）／人感センサー／マイク（音）／赤外線受光センサー</td></tr>
+      <tr><td>主な部品</td><td>抵抗（150Ω・4.7k・10k・22k・68k・200kΩ）／半固定抵抗（100kΩ・1MΩ）／トランジスタ C1815・A1015／コンデンサ 47µF／メロディIC／スピーカー／押しボタンスイッチ／LED</td></tr>
+      <tr><td>音</td><td>Web Audio API（メロディICの動作を再現／ミュート可）</td></tr>
+      <tr><td>外部通信</td><td>なし（Webフォントの読み込み以外、サーバーとの通信はありません）</td></tr>
+      <tr><td>データ保存</td><td>なし（個人情報・学習履歴・テストの得点を一切保存しません）</td></tr>
+      <tr><td>推奨環境</td><td>Google Chrome / Microsoft Edge / Safari（タブレット・スマートフォン対応）</td></tr>
+      <tr><td>URLパラメータ</td><td><code>?mode=</code> モード（basics / navi / learn / quiz）／ <code>?ch=</code> しくみの章 ／ <code>?s=</code> センサー ／ <code>?out=</code> 動かすもの ／ <code>?d=</code> 動き方 ／ <code>?view=</code> タブ ／ <code>?step=</code> 手順 ／ <code>?basics=</code> きほんのステップ</td></tr>
+    </tbody>
+  </table>
+
+</main>
+
+<!-- ── ご利用にあたって ── -->
+<section class="notice-section">
+  <div class="inner">
+    <p class="section-label" style="margin-top:0">Notice</p>
+    <p class="section-title" style="margin-bottom:24px;">ご利用にあたって</p>
+    <dl class="notice-dl">
+      <div class="notice-row">
+        <dt class="notice-dt">📄 利用について</dt>
+        <dd class="notice-dd">本ツールは研究・教育目的で開発されました。授業や研修での利用は自由です。再配布・改変する場合は著作者名を残してください。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">🔒 データの取り扱い</dt>
+        <dd class="notice-dd">回路ナビはブラウザの中だけで動作し、入力内容や操作履歴をサーバーに送信しません。個人情報を扱わないため、アカウント登録も不要です。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">🔌 実物の回路について</dt>
+        <dd class="notice-dd">配線図は授業で配布しているプリントの配置図をもとに作成し、キットの部品だけで組めること・電流が流れすぎないことを計算で確かめています。ただし、授業で使う前に必ず実物で動作を確認してください。半固定抵抗の足は部品の下にかくれて見えないため、穴の位置は目安です。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">🧪 シミュレーションについて</dt>
+        <dd class="notice-dd">「ためしてみる」の動きは、回路のしくみをわかりやすく示すためのものです。実際の明るさ・音量・反応時間を正確に再現するものではありません。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">🎬 動画・回路図</dt>
+        <dd class="notice-dd">参考作品の動画とPDFは Google ドライブ上のファイルを埋め込んでいます。共有設定や学校アカウントの制限により、表示にログインが必要になる場合があります。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">⚠️ 免責事項</dt>
+        <dd class="notice-dd">本ツールの使用によって生じたいかなる損害についても、開発者は責任を負いません。</dd>
+      </div>
+      <div class="notice-row">
+        <dt class="notice-dt">🌐 推奨環境</dt>
+        <dd class="notice-dd">Google Chrome（最新版）を推奨します。Edge・Safari でも動作しますが、音の再生など一部の挙動が異なる場合があります。</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  © TAKANO tools &nbsp;|&nbsp; 回路ナビ（センサー回路 ブレッドボード配線ナビゲーター）&nbsp;|&nbsp;
+  <a href="https://kt-1127.github.io/Open-EduTech-Lab/" target="_blank" rel="noopener noreferrer">Open EduTech Lab</a>
+</footer>
+
+</body>
+</html>
