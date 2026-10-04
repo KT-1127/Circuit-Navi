@@ -20,6 +20,7 @@
 <meta property="og:image" content="kairo-images/top2.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="kairo-images/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="kairo-images/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
@@ -202,7 +203,7 @@
   }
   .work-head h3 { font-size: .93rem; font-weight: 700; line-height: 1.6; }
   .work-video { background: #000; aspect-ratio: 16 / 9; }
-  .work-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .work-video video { width: 100%; height: 100%; display: block; object-fit: contain; background: #000; }
   .work-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
   .work-set { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
@@ -559,84 +560,84 @@
 
     <div class="work">
       <div class="work-head"><span class="work-no">1</span><h3>暗くなるとLEDが点灯し、明るくなると徐々に消灯する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/1GduxcoU-z7Si5NeRH2wJ8pbpDg2kWek3/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品1の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work1.jpg" title="参考作品1の動画"><source src="kairo-works/work1.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/15-P9mCGKZSh2rlMEHC4xaLUBa1PNbKF4/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit1.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">2</span><h3>人がいて、明るいと徐々にメロディが流れ出す。人がいない、または暗いと徐々に消音する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/1B48ix8vOC0jg3pIIlI12wruz5WrZSnTs/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品2の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work2.jpg" title="参考作品2の動画"><source src="kairo-works/work2.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">🚶 人</span><span class="chip s">☀️ 明るさ（明るいとき）</span><span class="chip o">🎵 メロディ</span><span class="chip d">⏱ オンディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=person,light-bright&out=mel&d=on" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/14uFh_4E0L9l3jTFDlMGTL9Xcf0sacsqX/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit2.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">3</span><h3>音がするとLEDが点灯し、音がなくなると徐々に消灯する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/1EJd6pAf86YOqPLwlMNGLiqo8ANJHkyZA/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品3の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work3.jpg" title="参考作品3の動画"><source src="kairo-works/work3.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">🎤 音</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=sound&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/1pa1DIA5_T5CmgXAEzrvGSSKW49sXYf6G/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit3.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">4</span><h3>赤外線を受光するとLEDが点灯し、その後、赤外線がないと徐々に消灯する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/10Gxipv7D8EBRugLpagbmQhS9Z-2YJC5R/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品4の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work4.jpg" title="参考作品4の動画"><source src="kairo-works/work4.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">📡 赤外線</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=ir&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/1qXH6JX7sL8znfXEMmbi3M3C4FkK7u82B/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit4.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">5</span><h3>人がいて、暗いとLEDが点灯し、人がいないまたは明るいと徐々に消灯する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/1UnogKCYvF-vTVxHJlK4OzxUquO2DaQEH/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品5の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work5.jpg" title="参考作品5の動画"><source src="kairo-works/work5.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">🚶 人</span><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=person,light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/1SJI0ckWvTVt0CXFNwSxJhXmopv_xmbjV/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit5.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">6</span><h3>暗くて、音がするとLEDが点灯し、明るいまたは音がしないと徐々に消灯する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/13zJKDjhzcDpAuN2uAouHkN6OTG1-kW_u/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品6の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work6.jpg" title="参考作品6の動画"><source src="kairo-works/work6.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">🎤 音</span><span class="chip s">☀️ 明るさ（暗いとき）</span><span class="chip o">💡 LED</span><span class="chip d">⏱ オフディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=sound,light-dark&out=led&d=off" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/18YjwwQKuZ7VnB_A1wP8YnwuGe_ThUQe5/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit6.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
 
     <div class="work">
       <div class="work-head"><span class="work-no">7</span><h3>人がいると徐々にメロディが流れ出す。人がいないと、徐々に消音する。</h3></div>
-      <div class="work-video"><iframe src="https://drive.google.com/file/d/1bxHN67xhjBhJBsW1m_hEykAVpTdfudZ7/preview" allow="autoplay" allowfullscreen loading="lazy" title="参考作品7の動画"></iframe></div>
+      <div class="work-video"><video controls playsinline preload="none" poster="kairo-works/work7.jpg" title="参考作品7の動画"><source src="kairo-works/work7.mp4" type="video/mp4">お使いのブラウザでは動画を再生できません。</video></div>
       <div class="work-body">
         <div class="work-set"><span class="chip s">🚶 人</span><span class="chip o">🎵 メロディ</span><span class="chip d">⏱ オンディレイ</span></div>
         <div class="work-links">
           <a class="wl-open" href="kairo-navi.html?s=person&out=mel&d=on" target="_blank" rel="noopener noreferrer">回路ナビで開く →</a>
-          <a class="wl-pdf" href="https://drive.google.com/file/d/1-fTto06tFv0wO1IycvGtGPfsNhKFApK0/view?usp=drive_link" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
+          <a class="wl-pdf" href="kairo-works/circuit7.pdf" target="_blank" rel="noopener noreferrer">回路図（PDF）</a>
         </div>
       </div>
     </div>
@@ -646,7 +647,7 @@
   <p class="source-note">
     動画・回路図は、授業用に公開している Google サイト
     <a href="https://sites.google.com/iizuna.ed.jp/kairo/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener noreferrer">「【参考作品】回路」</a>
-    の内容を引用しています。Google ドライブ上のファイルのため、共有設定によっては動画・PDFの表示にログインが必要になる場合があります。その場合でも、回路ナビ本体はそのまま利用できます。
+    の内容です。動画と回路図（PDF）はこのサイトに置いているので、Google ドライブにつながらない環境やログインしていない状態でも見られます。
   </p>
 
   <!-- ── 授業での使い方 ── -->
@@ -712,7 +713,7 @@
       </div>
       <div class="notice-row">
         <dt class="notice-dt">🎬 動画・回路図</dt>
-        <dd class="notice-dd">参考作品の動画とPDFは Google ドライブ上のファイルを埋め込んでいます。共有設定や学校アカウントの制限により、表示にログインが必要になる場合があります。</dd>
+        <dd class="notice-dd">参考作品の動画と回路図（PDF）はこのサイト内に置いているため、ログインなしで見られます。</dd>
       </div>
       <div class="notice-row">
         <dt class="notice-dt">⚠️ 免責事項</dt>
